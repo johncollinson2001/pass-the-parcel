@@ -8,8 +8,7 @@ public class WorkerController : MonoBehaviour
     private bool _jumping;
 
     public GameObject _startingPlatform;
-    public ScreenSide _playingSide;
-    public float _jumpySkippyness = 0.3f;
+    public ScreenSide _playingSide;    
 
 	public int ParcelsLoaded { get; set; }
     public bool Active { get; set; } 
@@ -200,7 +199,7 @@ public class WorkerController : MonoBehaviour
 						+ colliderOffset // The offset of the collider from the game object
 						+ (destinationPlatformHeight / 2) // plus half the height
 						+ (workerHeight / 2) // plus half the workers height
-						+ (_jumping ? _jumpySkippyness : 0); // Plus a little extra to make it a little skippy jump
+						+ (_jumping ? Defaults.Worker.jumpySkippyness : 0); // Plus a little extra to make it a little skippy jump
 		// Destination X is the current X position - we don't move the worker horizontally
 		float destinationX = transform.position.x;
 

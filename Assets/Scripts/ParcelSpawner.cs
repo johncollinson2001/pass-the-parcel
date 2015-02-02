@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ParcelSpawner : MonoBehaviour 
 {
-	private float _nextSpawn = ParcelSpawnerDefaults.startSpawningBuffer;
+	private float _nextSpawn = Defaults.ParcelSpawner.startSpawningBuffer;
 	private int _spawnCount;
     private int _spawnCountWhenWaveCompleted;
     private int _spawnsInCurrentWave;
@@ -38,7 +38,7 @@ public class ParcelSpawner : MonoBehaviour
                 SpawnParcel();
             } 
             // Check if it's time to alert that a spawn wave is iminent
-            else if (!_isWaveActive && !_alerting && Time.time > (_nextSpawn - ParcelSpawnerDefaults.spawnWaveAlertTime))
+            else if (!_isWaveActive && !_alerting && Time.time > (_nextSpawn - Defaults.ParcelSpawner.spawnWaveAlertTime))
             {
                 ShowAlert();
             }
@@ -96,7 +96,7 @@ public class ParcelSpawner : MonoBehaviour
         _spawnCountWhenWaveCompleted = 0;
         _nextSpawnPauseBuffer = 0;
         _isWaveActive = false;
-        _nextSpawn = Time.time + ParcelSpawnerDefaults.startSpawningBuffer;
+        _nextSpawn = Time.time + Defaults.ParcelSpawner.startSpawningBuffer;
         HideAlert();
     }
 
@@ -125,12 +125,12 @@ public class ParcelSpawner : MonoBehaviour
     IEnumerator FlashAlert()
     {
         // Iterate through the pause length to hold the game
-        for (float i = 0; i < ParcelSpawnerDefaults.spawnWaveAlertTime; i += ParcelSpawnerDefaults.spawnAlertBlinkSpeed)
+        for (float i = 0; i < Defaults.ParcelSpawner.spawnWaveAlertTime; i += Defaults.ParcelSpawner.spawnAlertBlinkSpeed)
         {
             // Update the hud
             _parcelAlert.renderer.enabled = !_parcelAlert.renderer.enabled;
 
-            yield return new WaitForSeconds(ParcelSpawnerDefaults.spawnAlertBlinkSpeed);
+            yield return new WaitForSeconds(Defaults.ParcelSpawner.spawnAlertBlinkSpeed);
         }
     }
 
@@ -170,7 +170,7 @@ public class ParcelSpawner : MonoBehaviour
     void EndCurrentWave()
     {
         // Decrement the spawn wave gap so the waves get progressively closer together
-        SpawnWaveGap -= ParcelSpawnerDefaults.reduceSpawnWaveGapModifier;
+        SpawnWaveGap -= Defaults.ParcelSpawner.reduceSpawnWaveGapModifier;
 
         // Set the flag for an active wave to false
         _isWaveActive = false;

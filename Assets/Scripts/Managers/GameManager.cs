@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     void ResetGame()
     {
         // Reset game manager variables
-        _livesRemaining = GameDefaults.startingLives;
+        _livesRemaining = Defaults.Game.startingLives;
         _parcelsLoadedTotal = 0;
         _parcelsLoadedOnCurrentTruck = 0;
 
@@ -141,10 +141,10 @@ public class GameManager : MonoBehaviour
     IEnumerator CountdownToRestartLevelFollowingLostLife()
     {
         // Iterate through the pause length to hold the game
-        for (float timer = GameDefaults.lifeLostPauseLength; timer >= 0; timer -= Time.deltaTime)
+        for (float timer = Defaults.Game.lifeLostPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
             // Update the hud
-            _hudController.WriteCountdownToScreen(GameDefaults.lifeLostCountdownLength, timer);
+            _hudController.WriteCountdownToScreen(Defaults.Game.lifeLostCountdownLength, timer);
 
             yield return 0;
         }
@@ -195,10 +195,10 @@ public class GameManager : MonoBehaviour
     IEnumerator CountdownToNextLevel()
     {
         // Iterate through the pause length to hold the game
-        for (float timer = GameDefaults.levelUpPauseLength; timer >= 0; timer -= Time.deltaTime)
+        for (float timer = Defaults.Game.levelUpPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
             // Update the hud
-            _hudController.WriteCountdownToScreen(GameDefaults.levelUpCountdownLength, timer);
+            _hudController.WriteCountdownToScreen(Defaults.Game.levelUpCountdownLength, timer);
 
             yield return 0;
         }        

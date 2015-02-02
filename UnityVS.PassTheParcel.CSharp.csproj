@@ -56,10 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Constants\GameDefaults.cs" />
-    <Compile Include="Assets\Scripts\Constants\ParcelSpawnerDefaults.cs" />
+    <Compile Include="Assets\Scripts\Constants\Defaults.cs" />
     <Compile Include="Assets\Scripts\Constants\LevelUpRules.cs" />
-    <Compile Include="Assets\Scripts\Constants\LevelDefaults.cs" />
     <Compile Include="Assets\Scripts\Constants\Controls.cs" />
     <Compile Include="Assets\Scripts\Constants\Layers.cs" />
     <Compile Include="Assets\Scripts\Constants\Messages.cs" />

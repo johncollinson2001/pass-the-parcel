@@ -8,13 +8,13 @@ public static class LevelGenerator
         return new LevelModel()
         {
             LevelNumber = 1,
-            ConveyorBeltSpeed = LevelDefaults.conveyorBeltSpeed,
-            TruckCapacity = LevelDefaults.truckCapacity,
-            SpawnRate = LevelDefaults.spawnRate,
-            MinimumSpawnsPerBurst = LevelDefaults.minimumSpawnsPerBurst,
-            MaximumSpawnsPerBurst = LevelDefaults.maximumSpawnsPerBurst,
-            SpawnBurstGap = LevelDefaults.spawnBurstGap,
-            UseSpawnRateRandomiser = LevelDefaults.useSpawnRateRandomiser
+            ConveyorBeltSpeed = Defaults.LevelStart.conveyorBeltSpeed,
+            TruckCapacity = Defaults.LevelStart.truckCapacity,
+            SpawnRate = Defaults.LevelStart.spawnRate,
+            MinimumSpawnsPerBurst = Defaults.LevelStart.minimumSpawnsPerBurst,
+            MaximumSpawnsPerBurst = Defaults.LevelStart.maximumSpawnsPerBurst,
+            SpawnBurstGap = Defaults.LevelStart.spawnBurstGap,
+            UseSpawnRateRandomiser = Defaults.LevelStart.useSpawnRateRandomiser
         };
     }
 
