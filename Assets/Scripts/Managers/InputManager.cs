@@ -23,8 +23,8 @@ public class InputManager : MonoBehaviour
     // Handles the input that will restart the game
     void HandleInputToRestartGame()
     {
-        // Check the game is not active
-        if(!_gameManager.IsActiveGame)
+        // Check the game is in game over state
+        if(_gameManager.CurrentState == GameState.GameOver)
         {
             // Look for user pressing the space bar key
             if (Input.GetKeyDown(Controls.gameRestart))

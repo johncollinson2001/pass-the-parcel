@@ -6,23 +6,44 @@ public class WorkerController : MonoBehaviour
 {
     private GameObject _currentPlatform;
     private bool _jumping;
+    private Animator _animator;
 
     public GameObject _startingPlatform;
-    public ScreenSide _playingSide;    
+    public ScreenSide _playingSide;
+    public ScreenSide _facing;
 
 	public int ParcelsLoaded { get; set; }
     public bool Active { get; set; } 
 
     #region Mono Behaviours
+
+    void Awake()
+    {
+        // Get the animator and ensure all animation is reset
+        _animator = gameObject.GetComponent<Animator>();
+        ResetAnimation();
+    }
     
     void OnEnable()
     {
         EventManager.Instance.ParcelDropped += PassTheParcel;
+        EventManager.Instance.GameStateChanged += OnGameOver;
     }
 
     void OnDisable()
     {
         EventManager.Instance.ParcelDropped -= PassTheParcel;
+        EventManager.Instance.GameStateChanged -= OnGameOver;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // If the player has landed on a platform
+        if (collision.gameObject.tag == Tags.workerPlatform)
+        {
+            // Turn the jumping animation off
+            _animator.SetBool("jump", false);
+        }
     }
 
     #endregion
@@ -44,6 +65,9 @@ public class WorkerController : MonoBehaviour
                 break;
         }
 
+        // Turn the worker to face the right direction
+        TurnWorkerToFaceConveyorBelt();
+
         _jumping = false;
     }
 
@@ -62,16 +86,18 @@ public class WorkerController : MonoBehaviour
                 break;
         }
 
+        // Turn the worker to face the right direction
+        TurnWorkerToFaceConveyorBelt();
+
         _jumping = false;
     }
 
-    #endregion
-
-    #region Public Methods
-
     // Resets the worker
     public void Reset()
-    {
+    {       
+        // Reset animation
+        ResetAnimation();
+
         // Reset the current platform back to starting platform
         _currentPlatform = _startingPlatform;
 
@@ -83,22 +109,104 @@ public class WorkerController : MonoBehaviour
 
     #region Private Methods
 
+    // Turns the worker to face the receiving conveyor belt of the platform he's standing on
+    void TurnWorkerToFaceConveyorBelt()
+    {
+        // Check if we need to turn the worker round to face the receiving from platform
+        if (_facing == ScreenSide.Left
+            && _currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left)
+        {
+            TurnWorker();
+        }
+        else if (_facing == ScreenSide.Right
+            && _currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Right)
+        {
+            TurnWorker();
+        }
+    }
+
+    // Turns the player to face in the opposite direction
+    void TurnWorker()
+    {
+        // Work out the new x scale
+        Vector3 newLocalScale = transform.localScale;
+        newLocalScale.x *= -1;       
+        transform.localScale = newLocalScale;
+
+        // Transform the x position to align the player exactly to where they are standing
+        if (newLocalScale.x > 0)
+        {
+            transform.position += new Vector3(((newLocalScale.x - 1f) / 2), 0, 0);
+        }
+        else
+        {
+            transform.position += new Vector3(((newLocalScale.x + 1f) / 2), 0, 0);
+        }
+
+        // Set facing flag
+        _facing = (_facing == ScreenSide.Left ? ScreenSide.Right : ScreenSide.Left);
+    }
+
+    // Resets the animation
+    void ResetAnimation()
+    {
+        if(_animator != null)
+        {
+            _animator.SetBool("walk", false);
+            _animator.SetBool("dead", false);
+            _animator.SetBool("jump", false);
+        }
+
+        if(_playingSide == ScreenSide.Left && _facing == ScreenSide.Left)
+        {
+            TurnWorker();
+        }
+        else if (_playingSide == ScreenSide.Right && _facing == ScreenSide.Right)
+        {
+            TurnWorker();
+        }
+    }
+
+    // Looks for game over state change and makes the player die animation 
+    void OnGameOver(GameState changedFrom, GameState changedTo)
+    {
+        // Look for state changing to game over
+        if(changedTo == GameState.GameOver)
+        {
+            // Make the player die animation display
+            _animator.SetBool("dead", true);
+        }
+    }
+
+    // Passes the parecel along the conveyor belts
     void PassTheParcel(GameObject conveyorBelt, GameObject parcel)
 	{
 		// Check to see if the parcel is still falling
-		if (parcel.GetComponent<ParcelController>().HasBeenDropped) 
+		if (parcel.GetComponent<ParcelController>().IsFalling) 
 		{
-			// Get the conveyor belt that can be received from for the platform the worker is 
-			// standing on
-			GameObject receiveFromConveyor = 
-				_currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor;
+			// Get the conveyor belt that can be received from for the platform the worker is standing on
+			GameObject receiveFromConveyor = _currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor;            
 
 			// If the conveyor belt that the parcel is falling from is the conveyor belt
 			// that can be received from
 			if (conveyorBelt == receiveFromConveyor)
-			{
-				// Mark the parcel as no longer falling
-				parcel.GetComponent<ParcelController>().HasBeenDropped = false;
+			{                
+                // Set the animation of the sprite
+                _animator.SetBool("passing", true);
+
+                // Get the conveyor belt that can be passed to from the platform the worker is standing on
+                GameObject passToConveyor = _currentPlatform.GetComponent<PlatformController>()._passToConveyor;
+
+                // Turn the worker so they pass the parcel from one side of the platform to the other
+                // if the platforms conveyors are setup to pass from one side to another
+                if (_facing == ScreenSide.Right 
+                    && receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left
+                    && (passToConveyor != null && passToConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left))
+                {
+                    TurnWorker();
+                    // Turn the worker back to the way they were originally facing
+                    StartCoroutine(TurnWorkerAfterPassingParcel(0.25f));
+                }               
 
 				// If the worker is on the platform that loads the truck
 				if (_currentPlatform.GetComponent<PlatformController>()._loadsTruck)
@@ -110,10 +218,22 @@ public class WorkerController : MonoBehaviour
 				{
 					// else move the parcel to the next conveyor
 					PassParcelToNextConveyor(parcel);
-				}			
+				}    
+            
+                // Set parcel to passed
+                parcel.GetComponent<ParcelController>().Pass();
 			}
 		}
 	}
+
+    // Turns the worker after a specified number of seconds delay
+    IEnumerator TurnWorkerAfterPassingParcel(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+
+        _animator.SetBool("passing", false);
+        TurnWorker();
+    }
 
 	// Loads a parcel onto the truck
 	void LoadParcelOntoTruck(GameObject parcel)
@@ -203,8 +323,14 @@ public class WorkerController : MonoBehaviour
 		// Destination X is the current X position - we don't move the worker horizontally
 		float destinationX = transform.position.x;
 
-		// Jump to the new position
-		transform.position = new Vector3 (destinationX, destinationY);
+		// Set the animator to jumping
+        if (_jumping)
+        {
+            _animator.SetBool("jump", true);
+        }
+		
+        // Jump to the new position
+        transform.position = new Vector3 (destinationX, destinationY);
 
         // Set the current platform
 		_currentPlatform = destinationPlatform;

@@ -19,7 +19,7 @@ public class ConveyorBeltController : MonoBehaviour
 
     #region Mono Behaviours
 
-    void Start () 
+    void Awake() 
     {
 	    // Set the cogs... Iterate over all children 
         foreach(Transform child in transform)
@@ -61,10 +61,10 @@ public class ConveyorBeltController : MonoBehaviour
         if (collision.gameObject.tag == Tags.parcel)
         {
             // Remove the parcel from the list
-            _parcels.Remove(collision.gameObject);
+            _parcels.Remove(collision.gameObject);			
 
-			// Mark the parcel as dropped
-			collision.gameObject.GetComponent<ParcelController>().HasBeenDropped = true;
+            // Drop the parcel
+            collision.gameObject.GetComponent<ParcelController>().Drop();
 
 			// Trigger an event to shout to the world that the parcel is falling
 			EventManager.Instance.TriggerParcelDropped(this.gameObject, collision.gameObject);

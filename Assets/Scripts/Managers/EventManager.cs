@@ -62,4 +62,24 @@ public class EventManager
             ParcelBroken();
         }
     }
+
+    // Parcel caught
+    public event Action<GameObject> ParcelPassed;
+    public void TriggerParcelPassed(GameObject parcel)
+    {
+        if (ParcelPassed != null)
+        {
+            ParcelPassed(parcel);
+        }
+    }
+
+    // Game state changed event
+    public event Action<GameState, GameState> GameStateChanged;
+    public void TriggerGameStateChanged(GameState changedFrom, GameState changedTo)
+    {
+        if (GameStateChanged != null)
+        {
+            GameStateChanged(changedFrom, changedTo);
+        }
+    }
 }

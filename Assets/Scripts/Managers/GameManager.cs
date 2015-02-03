@@ -4,9 +4,7 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
-	private int _livesRemaining;
-    private int _parcelsLoadedTotal;
-    private int _parcelsLoadedOnCurrentTruck;
+    private GameState _currentState;
 
     public HUDController _hudController;    
     public ParcelSpawner _parcelSpawner;
@@ -14,7 +12,19 @@ public class GameManager : MonoBehaviour
     public GameObject _workerRight;
     public List<GameObject> _conveyorBelts = new List<GameObject>();
 
-    public bool IsActiveGame { get { return _livesRemaining > 0; } }
+    public int LivesRemaining { get; private set; }
+    public int ParcelsLoadedTotal { get; private set; }
+    public int ParcelsLoadedOnCurrentTruck { get; private set; }
+
+    public GameState CurrentState
+    {
+        get { return _currentState; }
+        private set
+        {
+            EventManager.Instance.TriggerGameStateChanged(_currentState, value);
+            _currentState = value;
+        }
+    }
 
 	#region Mono Behaviours
 
@@ -23,17 +33,6 @@ public class GameManager : MonoBehaviour
 		// Start the game
         StartNewGame();
 	}
-
-    void Update()
-    {
-        // Update the heads up display unit
-        _hudController.UpdateHUD(
-            _livesRemaining.ToString(),
-            LevelManager.Instance.CurrentLevel.LevelNumber.ToString(),
-            LevelManager.Instance.CurrentLevel.TruckCapacity.ToString(),
-            _parcelsLoadedOnCurrentTruck.ToString()
-        );
-    }
 
     void OnEnable()
     {
@@ -54,14 +53,14 @@ public class GameManager : MonoBehaviour
     // Starts a new game
     public void StartNewGame()
     {
-        // Clear the text from the HUD
-        _hudController.ClearText();
-
         // Reset the game
         ResetGame();        
 
         // Start the game
         ActivateGameObjects();
+
+        // Set game state
+        CurrentState = GameState.Active;
     }
 
     #endregion
@@ -72,9 +71,9 @@ public class GameManager : MonoBehaviour
     void ResetGame()
     {
         // Reset game manager variables
-        _livesRemaining = Defaults.Game.startingLives;
-        _parcelsLoadedTotal = 0;
-        _parcelsLoadedOnCurrentTruck = 0;
+        LivesRemaining = Defaults.Game.startingLives;
+        ParcelsLoadedTotal = 0;
+        ParcelsLoadedOnCurrentTruck = 0;
 
         // Clear all parcels from the conveyors
         foreach (var conveyor in _conveyorBelts)
@@ -106,13 +105,13 @@ public class GameManager : MonoBehaviour
 	void HandleDroppedParcel()
 	{
         // Ensure the game has not already ended
-        if (IsActiveGame)
+        if (CurrentState == GameState.Active)
         {
             // Decrement worker life counter
-            _livesRemaining -= 1;
+            LivesRemaining -= 1;
 
             // See if the game is over
-            if (_livesRemaining == 0)
+            if (LivesRemaining == 0)
             {
                 // End the game
                 EndGame();
@@ -127,11 +126,14 @@ public class GameManager : MonoBehaviour
 
     void PauseForLostLife()
     {
+        // Set game state
+        CurrentState = GameState.LostLife;
+
         // Pause the game
         PauseGame();
 
-        // Update the hud with lost life
-        _hudController.WriteLifeLostTextToScreen(_livesRemaining.ToString());
+        // Get the HUD to display a countdown
+        _hudController.ShowCountdown(Defaults.Game.lifeLostPauseLength, Defaults.Game.lifeLostCountdownLength);
 
         // Kick off a coroutine to pause until the game starts again
         StartCoroutine(CountdownToRestartLevelFollowingLostLife());
@@ -143,9 +145,6 @@ public class GameManager : MonoBehaviour
         // Iterate through the pause length to hold the game
         for (float timer = Defaults.Game.lifeLostPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
-            // Update the hud
-            _hudController.WriteCountdownToScreen(Defaults.Game.lifeLostCountdownLength, timer);
-
             yield return 0;
         }
 
@@ -156,9 +155,6 @@ public class GameManager : MonoBehaviour
     // Starts the next level
     void RestartLevelFollowingLostLife()
     {
-        // Clear the text from the HUD
-        _hudController.ClearText();
-
         // Unpause the game
         UnpauseGame();
     }
@@ -167,11 +163,11 @@ public class GameManager : MonoBehaviour
 	void HandleLoadedParcel()
 	{
 		// Increment loaded parcels counter
-		_parcelsLoadedTotal += 1;
-        _parcelsLoadedOnCurrentTruck += 1;
+		ParcelsLoadedTotal += 1;
+        ParcelsLoadedOnCurrentTruck += 1;
 
 		// See if the truck is full
-        if (_parcelsLoadedOnCurrentTruck == LevelManager.Instance.CurrentLevel.TruckCapacity)
+        if (ParcelsLoadedOnCurrentTruck == LevelManager.Instance.CurrentLevel.TruckCapacity)
         {
             // Player has reached the next level
             MoveToNextLevel();
@@ -181,11 +177,14 @@ public class GameManager : MonoBehaviour
     // Moves the worker to the next level
     void MoveToNextLevel()
     {
+        // Set game state
+        CurrentState = GameState.LevelCompleted;
+
         // Pause the game
         PauseGame();
 
-        // Update the hud with level up text
-        _hudController.WriteLevelUpTextToScreen(LevelManager.Instance.CurrentLevel.LevelNumber.ToString(), (LevelManager.Instance.CurrentLevel.LevelNumber + 1).ToString());
+        // Get the HUD to display a countdown
+        _hudController.ShowCountdown(Defaults.Game.levelUpPauseLength, Defaults.Game.levelUpCountdownLength);
 
         // Kick off a coroutine to pause until the next level starts
         StartCoroutine(CountdownToNextLevel());
@@ -197,9 +196,6 @@ public class GameManager : MonoBehaviour
         // Iterate through the pause length to hold the game
         for (float timer = Defaults.Game.levelUpPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
-            // Update the hud
-            _hudController.WriteCountdownToScreen(Defaults.Game.levelUpCountdownLength, timer);
-
             yield return 0;
         }        
 
@@ -210,9 +206,6 @@ public class GameManager : MonoBehaviour
     // Starts the next level
     void StartNextLevel()
     {
-        // Clear the text from the HUD
-        _hudController.ClearText();
-
         // Up the level
         LevelManager.Instance.LevelUp();
 
@@ -220,7 +213,7 @@ public class GameManager : MonoBehaviour
         ApplyLevelSettingsToGame();
 
         // Reset counter
-        _parcelsLoadedOnCurrentTruck = 0;
+        ParcelsLoadedOnCurrentTruck = 0;
 
         // Unpause the game
         UnpauseGame();
@@ -244,16 +237,22 @@ public class GameManager : MonoBehaviour
 
 	void EndGame()
 	{
+        // Set game state
+        CurrentState = GameState.GameOver;
+
 		// Pause the game
         PauseGame();
-
-        // Display game ended message
-        _hudController.WriteGameOverText();
     }
 
     // Pauses the game
     void PauseGame()
-    {        
+    {      
+        // Set game state
+        if(CurrentState == GameState.Active)
+        {
+            CurrentState = GameState.Paused;
+        }
+
         // Pause the parcel spawner
         _parcelSpawner.PauseSpawning();
 
@@ -269,6 +268,9 @@ public class GameManager : MonoBehaviour
 
         // Active the game objects
         ActivateGameObjects();
+
+        // Set game state
+        CurrentState = GameState.Active;
     }
 
     // Activates the game objects
@@ -278,7 +280,16 @@ public class GameManager : MonoBehaviour
         foreach (var conveyorBelt in _conveyorBelts)
         {
             conveyorBelt.GetComponent<ConveyorBeltController>().StartConveyorBelt();
-        }        
+        }
+
+        // Make any falling parcels unfreeze
+        foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
+        {
+            if (parcel.GetComponent<ParcelController>().IsFalling)
+            {
+                parcel.GetComponent<ParcelController>().Unfreeze();
+            }
+        }
 
         // Enable the workers
         _workerLeft.GetComponent<WorkerController>().Active = true;
@@ -295,6 +306,15 @@ public class GameManager : MonoBehaviour
         foreach (var conveyorBelt in _conveyorBelts)
         {
             conveyorBelt.GetComponent<ConveyorBeltController>().StopConveyorBelt();
+        }
+
+        // Make any falling parcels freeze
+        foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
+        {
+            if (parcel.GetComponent<ParcelController>().IsFalling)
+            {
+                parcel.GetComponent<ParcelController>().Freeze();
+            }
         }
 
         // Disable the workers

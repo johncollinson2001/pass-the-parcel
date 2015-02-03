@@ -7,16 +7,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CDB68A4F-0256-A9EF-C913-ED4F39236560}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <AssemblyName>Assembly-CSharp</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>4.6.1f1</UnityVersion>
@@ -56,26 +54,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Constants\Defaults.cs" />
-    <Compile Include="Assets\Scripts\Constants\LevelUpRules.cs" />
     <Compile Include="Assets\Scripts\Constants\Controls.cs" />
+    <Compile Include="Assets\Scripts\Constants\Defaults.cs" />
     <Compile Include="Assets\Scripts\Constants\Layers.cs" />
+    <Compile Include="Assets\Scripts\Constants\LevelUpRules.cs" />
     <Compile Include="Assets\Scripts\Constants\Messages.cs" />
     <Compile Include="Assets\Scripts\Constants\Tags.cs" />
     <Compile Include="Assets\Scripts\Controllers\ConveyorBeltController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\HUDController.cs" />
     <Compile Include="Assets\Scripts\Controllers\ParcelController.cs" />
     <Compile Include="Assets\Scripts\Controllers\PlatformController.cs" />
-    <Compile Include="Assets\Scripts\Controllers\WorkerController.cs" />
     <Compile Include="Assets\Scripts\Controllers\RotationController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\WorkerController.cs" />
+    <Compile Include="Assets\Scripts\DebugWriter.cs" />
+    <Compile Include="Assets\Scripts\Enums\GameState.cs" />
     <Compile Include="Assets\Scripts\Enums\PlatformLevel.cs" />
     <Compile Include="Assets\Scripts\Enums\RotationDirection.cs" />
     <Compile Include="Assets\Scripts\Enums\ScreenSide.cs" />
-    <Compile Include="Assets\Scripts\Controllers\HUDController.cs" />
-    <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
-    <Compile Include="Assets\Scripts\DebugWriter.cs" />
     <Compile Include="Assets\Scripts\Managers\EventManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\Scripts\Managers\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Models\LevelModel.cs" />
     <Compile Include="Assets\Scripts\ParcelSpawner.cs" />
