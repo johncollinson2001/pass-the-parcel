@@ -205,34 +205,38 @@ public class WorkerController : MonoBehaviour
                 {
                     TurnWorker();
                     // Turn the worker back to the way they were originally facing
-                    StartCoroutine(TurnWorkerAfterPassingParcel(0.25f));
+                    StartCoroutine(TurnWorkerAfterPassingParcel(0.25f, _currentPlatform));
                 }               
 
 				// If the worker is on the platform that loads the truck
 				if (_currentPlatform.GetComponent<PlatformController>()._loadsTruck)
 				{
-					// Load the parcel onto the truck
 					LoadParcelOntoTruck(parcel);
 				}
 				else
 				{
-					// else move the parcel to the next conveyor
 					PassParcelToNextConveyor(parcel);
 				}    
             
                 // Set parcel to passed
                 parcel.GetComponent<ParcelController>().Pass();
+
+                // Set animation state
+                _animator.SetBool("passing", false);
 			}
 		}
 	}
 
     // Turns the worker after a specified number of seconds delay
-    IEnumerator TurnWorkerAfterPassingParcel(float seconds)
+    IEnumerator TurnWorkerAfterPassingParcel(float seconds, GameObject currentPlatformWhenTurned)
     {
         yield return new WaitForSeconds(seconds);
 
-        _animator.SetBool("passing", false);
-        TurnWorker();
+        // Only turn the worker back if they are still on the same platform
+        if (currentPlatformWhenTurned == _currentPlatform)
+        {
+            TurnWorker();
+        }
     }
 
 	// Loads a parcel onto the truck

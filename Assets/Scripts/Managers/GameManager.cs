@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public ParcelSpawner _parcelSpawner;
     public GameObject _workerLeft;
     public GameObject _workerRight;
+    public GameObject _truck;
     public List<GameObject> _conveyorBelts = new List<GameObject>();
 
     public int LivesRemaining { get; private set; }
@@ -169,6 +170,9 @@ public class GameManager : MonoBehaviour
 		// See if the truck is full
         if (ParcelsLoadedOnCurrentTruck == LevelManager.Instance.CurrentLevel.TruckCapacity)
         {
+            // Tell the truck to deliver some parcels
+            _truck.GetComponent<TruckController>().DeliverParcels();
+
             // Player has reached the next level
             MoveToNextLevel();
         }		

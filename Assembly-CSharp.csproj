@@ -57,6 +57,7 @@
      <Compile Include="Assets\Scripts\Controllers\ParcelController.cs" />
      <Compile Include="Assets\Scripts\Controllers\PlatformController.cs" />
      <Compile Include="Assets\Scripts\Controllers\RotationController.cs" />
+     <Compile Include="Assets\Scripts\Controllers\TruckController.cs" />
      <Compile Include="Assets\Scripts\Controllers\WorkerController.cs" />
      <Compile Include="Assets\Scripts\DebugWriter.cs" />
      <Compile Include="Assets\Scripts\Enums\GameState.cs" />

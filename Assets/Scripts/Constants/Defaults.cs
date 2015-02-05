@@ -15,7 +15,7 @@
     {
         public static float conveyorBeltSpeed = 2;
         public static int truckCapacity = 2;
-        public static float spawnRate = 8;
+        public static float spawnRate = 6;
         public static int minimumSpawnsPerBurst = 2;
         public static int maximumSpawnsPerBurst = 3;
         public static float spawnBurstGap = 30;
@@ -35,5 +35,12 @@
     public static class Worker
     {
         public static float jumpySkippyness = 0.3f;
+    }
+
+    // Truck defaults
+    public static class Truck
+    {
+        public static int secondsToStartTruck = 2;
+        public static float reverseSpeedModifier = 1.5f;
     }
 }
