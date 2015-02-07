@@ -82,4 +82,14 @@ public class EventManager
             GameStateChanged(changedFrom, changedTo);
         }
     }
+
+    // Level Up event
+    public event Action<LevelModel, LevelModel> LevelUp;
+    public void TriggerLevelUp(LevelModel previousLevel, LevelModel nextLevel)
+    {
+        if (LevelUp != null)
+        {
+            LevelUp(previousLevel, nextLevel);
+        }
+    }
 }

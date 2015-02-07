@@ -12,6 +12,7 @@ public class HUDController : MonoBehaviour
     public GUIText _levelText;
     public GUIText _truckCapacityText;
     public GUIText _parcelLoadedOnTruckText;
+    public GUIText _scoreText;
     public GUIText _gameOverText;
     public GUIText _levelCompletedText;
     public GUIText _lifeLostText;
@@ -112,10 +113,11 @@ public class HUDController : MonoBehaviour
     // Updates the HUD
     void UpdateHUD()
 	{
-		_livesRemainingText.text = string.Format(Messages.livesRemaining, _gameManager.LivesRemaining);
-        _levelText.text = string.Format(Messages.level, LevelManager.Instance.CurrentLevel.LevelNumber);
-        _truckCapacityText.text = string.Format(Messages.truckCapacity, LevelManager.Instance.CurrentLevel.TruckCapacity);
-        _parcelLoadedOnTruckText.text = string.Format(Messages.parcelsLoadedOnTruck, _gameManager.ParcelsLoadedOnCurrentTruck);
+		_livesRemainingText.text = string.Format(HudText.livesRemaining, _gameManager.LivesRemaining);
+        _levelText.text = string.Format(HudText.level, LevelManager.Instance.CurrentLevel.LevelNumber);
+        _truckCapacityText.text = string.Format(HudText.truckCapacity, LevelManager.Instance.CurrentLevel.TruckCapacity);
+        _parcelLoadedOnTruckText.text = string.Format(HudText.parcelsLoadedOnTruck, _gameManager.ParcelsLoadedOnCurrentTruck);
+        _scoreText.text = string.Format(HudText.score, ScoreManager.Instance.CurrentScore);
 
         WriteGameOverText();
         WriteLevelCompletedTextToScreen();
@@ -127,7 +129,7 @@ public class HUDController : MonoBehaviour
     {
         if (_showGameOverText)
         {
-            _gameOverText.text = Messages.gameOver;
+            _gameOverText.text = HudText.gameOver;
         }
         else
         {
@@ -140,7 +142,7 @@ public class HUDController : MonoBehaviour
     {
         if (_showLevelCompletedText)
         {
-            _levelCompletedText.text = string.Format(Messages.levelCompleted, LevelManager.Instance.CurrentLevel.LevelNumber.ToString(), (LevelManager.Instance.CurrentLevel.LevelNumber + 1).ToString());
+            _levelCompletedText.text = string.Format(HudText.levelCompleted, LevelManager.Instance.CurrentLevel.LevelNumber.ToString(), (LevelManager.Instance.CurrentLevel.LevelNumber + 1).ToString());
         }
         else
         {
@@ -153,7 +155,7 @@ public class HUDController : MonoBehaviour
     {
         if (_showLifeLostText)
         {
-            _lifeLostText.text = string.Format(Messages.lostLife, _gameManager.LivesRemaining);
+            _lifeLostText.text = string.Format(HudText.lostLife, _gameManager.LivesRemaining);
         }
         else
         {

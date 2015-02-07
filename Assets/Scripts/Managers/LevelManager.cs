@@ -6,9 +6,6 @@ public class LevelManager
 {
     private static LevelManager _instance;
 
-    public GameObject _parcelSpawner;
-    public List<GameObject> _conveyorBelts = new List<GameObject>();
-
     public LevelModel CurrentLevel { get; private set; }
 
     public static LevelManager Instance

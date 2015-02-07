@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     void ResetGame()
     {
         // Reset game manager variables
-        LivesRemaining = Defaults.Game.startingLives;
+        LivesRemaining = Constants.Game.startingLives;
         ParcelsLoadedTotal = 0;
         ParcelsLoadedOnCurrentTruck = 0;
 
@@ -94,6 +94,9 @@ public class GameManager : MonoBehaviour
 
         // Reset the parcel spawner        
         _parcelSpawner.Reset();
+
+        // Reset the score
+        ScoreManager.Instance.Reset();
 
         // Ask the level manager to go back to starting level
         LevelManager.Instance.Reset();
@@ -134,7 +137,7 @@ public class GameManager : MonoBehaviour
         PauseGame();
 
         // Get the HUD to display a countdown
-        _hudController.ShowCountdown(Defaults.Game.lifeLostPauseLength, Defaults.Game.lifeLostCountdownLength);
+        _hudController.ShowCountdown(Constants.Game.lifeLostPauseLength, Constants.Game.lifeLostCountdownLength);
 
         // Kick off a coroutine to pause until the game starts again
         StartCoroutine(CountdownToRestartLevelFollowingLostLife());
@@ -144,7 +147,7 @@ public class GameManager : MonoBehaviour
     IEnumerator CountdownToRestartLevelFollowingLostLife()
     {
         // Iterate through the pause length to hold the game
-        for (float timer = Defaults.Game.lifeLostPauseLength; timer >= 0; timer -= Time.deltaTime)
+        for (float timer = Constants.Game.lifeLostPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
             yield return 0;
         }
@@ -188,7 +191,7 @@ public class GameManager : MonoBehaviour
         PauseGame();
 
         // Get the HUD to display a countdown
-        _hudController.ShowCountdown(Defaults.Game.levelUpPauseLength, Defaults.Game.levelUpCountdownLength);
+        _hudController.ShowCountdown(Constants.Game.levelUpPauseLength, Constants.Game.levelUpCountdownLength);
 
         // Kick off a coroutine to pause until the next level starts
         StartCoroutine(CountdownToNextLevel());
@@ -198,7 +201,7 @@ public class GameManager : MonoBehaviour
     IEnumerator CountdownToNextLevel()
     {
         // Iterate through the pause length to hold the game
-        for (float timer = Defaults.Game.levelUpPauseLength; timer >= 0; timer -= Time.deltaTime)
+        for (float timer = Constants.Game.levelUpPauseLength; timer >= 0; timer -= Time.deltaTime)
         {
             yield return 0;
         }        
@@ -210,6 +213,9 @@ public class GameManager : MonoBehaviour
     // Starts the next level
     void StartNextLevel()
     {
+        // Pull out the current level we are moving from to pass in the event
+        var previousLevel = LevelManager.Instance.CurrentLevel;
+
         // Up the level
         LevelManager.Instance.LevelUp();
 
@@ -221,6 +227,9 @@ public class GameManager : MonoBehaviour
 
         // Unpause the game
         UnpauseGame();
+
+        // Trigger the level up event
+        EventManager.Instance.TriggerLevelUp(previousLevel, LevelManager.Instance.CurrentLevel);
     }
 
     // Apply level settings to game 
@@ -286,11 +295,12 @@ public class GameManager : MonoBehaviour
             conveyorBelt.GetComponent<ConveyorBeltController>().StartConveyorBelt();
         }
 
-        // Make any falling parcels unfreeze
+        // Unfreeze all dropped parcels
         foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
         {
-            if (parcel.GetComponent<ParcelController>().IsFalling)
+            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
             {
+                // Oh dear the players about to loose another life!
                 parcel.GetComponent<ParcelController>().Unfreeze();
             }
         }
@@ -312,10 +322,10 @@ public class GameManager : MonoBehaviour
             conveyorBelt.GetComponent<ConveyorBeltController>().StopConveyorBelt();
         }
 
-        // Make any falling parcels freeze
+        // Freeze all dropped parcels
         foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
         {
-            if (parcel.GetComponent<ParcelController>().IsFalling)
+            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
             {
                 parcel.GetComponent<ParcelController>().Freeze();
             }

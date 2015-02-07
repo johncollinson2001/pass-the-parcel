@@ -48,7 +48,7 @@ public class TruckController : MonoBehaviour
             transform.position = Vector3.MoveTowards(
                 transform.position, 
                 new Vector3(_originalX, _originalY), 
-                (_animationSpeed / Defaults.Truck.reverseSpeedModifier) * Time.deltaTime
+                (_animationSpeed / Constants.Truck.reverseSpeedModifier) * Time.deltaTime
             );
         }
     }
@@ -75,7 +75,7 @@ public class TruckController : MonoBehaviour
 
     IEnumerator DriveAway()
     {
-        yield return new WaitForSeconds(Defaults.Truck.secondsToStartTruck);
+        yield return new WaitForSeconds(Constants.Truck.secondsToStartTruck);
 
         _returningToDepot = false;
         _deliveryInProgress = true;

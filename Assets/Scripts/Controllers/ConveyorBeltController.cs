@@ -48,23 +48,27 @@ public class ConveyorBeltController : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         // Test to see if the collision was with a parcel
-        if (collision.gameObject.tag == Tags.parcel)
+        if (collision.gameObject.tag == Tags.parcel && !_parcels.Exists(p => p == collision.gameObject))
         {
             // Add the parcel to the parcels list
             _parcels.Add(collision.gameObject);
         }
     }
 
+
+    // investigate if you can get a final on collision exit - when the whole object has left the conveyor
+    // or could try to set the rotation/physics force on the parcel when its passed so it doesnt tip over?
+
     void OnCollisionExit2D(Collision2D collision)
     {
         // Test to see if the collision was with a parcel
-        if (collision.gameObject.tag == Tags.parcel)
+        if (collision.gameObject.tag == Tags.parcel && _parcels.Exists(p => p == collision.gameObject))
         {
             // Remove the parcel from the list
-            _parcels.Remove(collision.gameObject);			
+            _parcels.Remove(collision.gameObject);
 
             // Drop the parcel
-            collision.gameObject.GetComponent<ParcelController>().Drop();
+            collision.gameObject.GetComponent<ParcelController>().State = ParcelState.Dropped;
 
 			// Trigger an event to shout to the world that the parcel is falling
 			EventManager.Instance.TriggerParcelDropped(this.gameObject, collision.gameObject);
@@ -141,10 +145,50 @@ public class ConveyorBeltController : MonoBehaviour
         if (_travellingTo == ScreenSide.Left)
         {
             xMovement = xMovement * -1;
-        }
+        }        
 
         // Move the object
         parcel.transform.position += new Vector3(xMovement, 0, 0);
+
+        // Set the state of the parcel depending on where we've moved it to
+        SetParcelState(parcel);
+    }
+
+    void SetParcelState(GameObject parcel)
+    {
+        float conveyorPositionX = transform.position.x;
+        float conveyorWidth = collider2D.bounds.size.x; // Work to the collider incase of offset
+        float parcelWidth = parcel.renderer.bounds.size.x;
+
+        // The calculations will be different depending on which way the conveyor is travelling
+        if (_travellingTo == ScreenSide.Left)
+        {
+            // Work out the position which the parcel must of moved beyond if we're to set the state
+            float aboutToDropX =
+                (conveyorPositionX - (conveyorWidth / 2))
+                + (parcelWidth / 2)
+                + Constants.ConveyorBelt.aboutToDropParcelBuffer;
+
+            if (parcel.GetComponent<ParcelController>().State != ParcelState.Dropped
+                && parcel.transform.position.x < aboutToDropX)
+            {
+                parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+            }
+        }
+        else
+        {
+            // Work out the position which the parcel must of moved beyond if we're to set the state
+            float aboutToDropX =
+                (conveyorPositionX + (conveyorWidth / 2))
+                - (parcelWidth / 2)
+                - Constants.ConveyorBelt.aboutToDropParcelBuffer;
+
+            if (parcel.GetComponent<ParcelController>().State != ParcelState.Dropped
+                && parcel.transform.position.x > aboutToDropX)
+            {
+                parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+            }
+        }
     }
 
     #endregion

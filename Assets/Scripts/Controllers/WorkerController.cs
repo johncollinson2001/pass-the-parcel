@@ -181,49 +181,42 @@ public class WorkerController : MonoBehaviour
     // Passes the parecel along the conveyor belts
     void PassTheParcel(GameObject conveyorBelt, GameObject parcel)
 	{
-		// Check to see if the parcel is still falling
-		if (parcel.GetComponent<ParcelController>().IsFalling) 
-		{
-			// Get the conveyor belt that can be received from for the platform the worker is standing on
-			GameObject receiveFromConveyor = _currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor;            
+		// Get the conveyor belt that can be received from for the platform the worker is standing on
+		GameObject receiveFromConveyor = _currentPlatform.GetComponent<PlatformController>()._receiveFromConveyor;            
 
-			// If the conveyor belt that the parcel is falling from is the conveyor belt
-			// that can be received from
-			if (conveyorBelt == receiveFromConveyor)
-			{                
-                // Set the animation of the sprite
-                _animator.SetBool("passing", true);
+		// If the conveyor belt that the parcel is falling from is the conveyor belt
+		// that can be received from
+		if (conveyorBelt == receiveFromConveyor)
+		{                
+            // Set the animation of the sprite
+            _animator.SetBool("passing", true);
 
-                // Get the conveyor belt that can be passed to from the platform the worker is standing on
-                GameObject passToConveyor = _currentPlatform.GetComponent<PlatformController>()._passToConveyor;
+            // Get the conveyor belt that can be passed to from the platform the worker is standing on
+            GameObject passToConveyor = _currentPlatform.GetComponent<PlatformController>()._passToConveyor;
 
-                // Turn the worker so they pass the parcel from one side of the platform to the other
-                // if the platforms conveyors are setup to pass from one side to another
-                if (_facing == ScreenSide.Right 
-                    && receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left
-                    && (passToConveyor != null && passToConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left))
-                {
-                    TurnWorker();
-                    // Turn the worker back to the way they were originally facing
-                    StartCoroutine(TurnWorkerAfterPassingParcel(0.25f, _currentPlatform));
-                }               
+            // Turn the worker so it looks like they pass the parcel from one side to the other
+            // if the current platform loads the truck (bit of a hack here - as we assume that loading the truck needs a turn)
+            // the worker is facing in the opposite direction to the conveyor they must pass to
+            if (_currentPlatform.GetComponent<PlatformController>()._loadsTruck
+                || _facing != passToConveyor.GetComponent<ConveyorBeltController>()._travellingTo)
+            {
+                TurnWorker();
+                // Turn the worker back to the way they were originally facing
+                StartCoroutine(TurnWorkerAfterPassingParcel(0.25f, _currentPlatform));
+            }               
 
-				// If the worker is on the platform that loads the truck
-				if (_currentPlatform.GetComponent<PlatformController>()._loadsTruck)
-				{
-					LoadParcelOntoTruck(parcel);
-				}
-				else
-				{
-					PassParcelToNextConveyor(parcel);
-				}    
-            
-                // Set parcel to passed
-                parcel.GetComponent<ParcelController>().Pass();
-
-                // Set animation state
-                _animator.SetBool("passing", false);
+			// If the worker is on the platform that loads the truck
+			if (_currentPlatform.GetComponent<PlatformController>()._loadsTruck)
+			{
+				LoadParcelOntoTruck(parcel);
 			}
+			else
+			{
+				PassParcelToNextConveyor(parcel);
+			}                            
+
+            // Set animation state
+            _animator.SetBool("passing", false);
 		}
 	}
 
@@ -256,42 +249,55 @@ public class WorkerController : MonoBehaviour
 	// worker is standing on
 	void PassParcelToNextConveyor(GameObject parcel)
 	{
-		// Get the conveyor belt that can be passed to for the platform the worker is 
-		// standing on
-		GameObject passToConveyor = 
-			_currentPlatform.GetComponent<PlatformController>()._passToConveyor;
-		
-		// Pass the parcel onto the pass to conveyor
-		// ... work out a bunch of values to help us work out where to put the parcel
-		float passToConveyorPositionX = passToConveyor.transform.position.x;
-		float passToConveyorPositionY = passToConveyor.transform.position.y;
-		float passToConveyorWidth = passToConveyor.collider2D.bounds.size.x; // Work to the collider incase of offset
-		float passToConveyorHeight = passToConveyor.collider2D.bounds.size.y; // Work to the collider incase of offset
-		float parcelWidth = parcel.renderer.bounds.size.x;
-		float parcelHeight = parcel.renderer.bounds.size.y;
-		// Destination X is...
-		float destinationX = 0;
-		// Flip the calculations depending on the side of the screen
-		if(_playingSide == ScreenSide.Left)
-		{
-			destinationX = passToConveyorPositionX // position of the pass to conveyor
-				- (passToConveyorWidth / 2) // minus half the conveyor width
-					+ (parcelWidth / 2); // plus half the parcels width
-		}
-		else
-		{
-			destinationX = passToConveyorPositionX // position of the pass to conveyor
-				+ (passToConveyorWidth / 2) // plus half the conveyor width
-					- (parcelWidth / 2); // minus half the parcels width
-		}
-		// Destination Y is...
-		float destinationY = passToConveyorPositionY // position of the pass to conveyor
-			+ (passToConveyorHeight / 2) // plus half the conveyor height
-				+ (parcelHeight / 2); // plus half the parcels height
-		
-		// Jump to the new position
-		parcel.transform.position = new Vector3 (destinationX, destinationY);
+		// Move the parcel to the next conveyor
+        MoveParcelToDestinationConveyor(parcel);
+
+        // Set parcel to travelling again
+        parcel.GetComponent<ParcelController>().State = ParcelState.Travelling;
+
+        // Raise event to say a parcel has been loaded
+        EventManager.Instance.TriggerParcelPassed(parcel);
 	}    
+
+    // Moves the parcel to the destination conveyor for the current platfrom this worker is stood on
+    void MoveParcelToDestinationConveyor(GameObject parcel)
+    {
+        // Get the conveyor belt that can be passed to for the platform the worker is 
+        // standing on
+        GameObject passToConveyor =
+            _currentPlatform.GetComponent<PlatformController>()._passToConveyor;
+
+        // Pass the parcel onto the pass to conveyor
+        // ... work out a bunch of values to help us work out where to put the parcel
+        float passToConveyorPositionX = passToConveyor.transform.position.x;
+        float passToConveyorPositionY = passToConveyor.transform.position.y;
+        float passToConveyorWidth = passToConveyor.collider2D.bounds.size.x; // Work to the collider incase of offset
+        float passToConveyorHeight = passToConveyor.collider2D.bounds.size.y; // Work to the collider incase of offset
+        float parcelWidth = parcel.renderer.bounds.size.x;
+        float parcelHeight = parcel.renderer.bounds.size.y;
+        // Destination X is...
+        float destinationX = 0;
+        // Flip the calculations depending on the side of the screen
+        if (_playingSide == ScreenSide.Left)
+        {
+            destinationX = passToConveyorPositionX // position of the pass to conveyor
+                - (passToConveyorWidth / 2) // minus half the conveyor width
+                    + (parcelWidth / 2); // plus half the parcels width
+        }
+        else
+        {
+            destinationX = passToConveyorPositionX // position of the pass to conveyor
+                + (passToConveyorWidth / 2) // plus half the conveyor width
+                    - (parcelWidth / 2); // minus half the parcels width
+        }
+        // Destination Y is...
+        float destinationY = passToConveyorPositionY // position of the pass to conveyor
+            + (passToConveyorHeight / 2) // plus half the conveyor height
+                + (parcelHeight / 2); // plus half the parcels height
+
+        // Jump to the new position
+        parcel.transform.position = new Vector3(destinationX, destinationY);
+    }
 
 	// Moves the worker to the specified platform
     void MoveWorker(PlatformLevel moveToLevel)
@@ -323,7 +329,7 @@ public class WorkerController : MonoBehaviour
 						+ colliderOffset // The offset of the collider from the game object
 						+ (destinationPlatformHeight / 2) // plus half the height
 						+ (workerHeight / 2) // plus half the workers height
-						+ (_jumping ? Defaults.Worker.jumpySkippyness : 0); // Plus a little extra to make it a little skippy jump
+						+ (_jumping ? Constants.Worker.jumpySkippyness : 0); // Plus a little extra to make it a little skippy jump
 		// Destination X is the current X position - we don't move the worker horizontally
 		float destinationX = transform.position.x;
 

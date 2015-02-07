@@ -1,24 +1,25 @@
-﻿public static class Defaults
+﻿using UnityEngine;
+public static class Constants
 {
     // Game play defaults
     public static class Game
     {
         public static int startingLives = 3;
         public static int levelUpPauseLength = 10;
-        public static int levelUpCountdownLength = 3;
+        public static int levelUpCountdownLength = 10;
         public static int lifeLostPauseLength = 10;
-        public static int lifeLostCountdownLength = 3;
+        public static int lifeLostCountdownLength = 10;
     }
 
     // Game start level defaults
-    public static class LevelStart
+    public static class LevelStartDefaults
     {
         public static float conveyorBeltSpeed = 2;
-        public static int truckCapacity = 2;
-        public static float spawnRate = 6;
+        public static int truckCapacity = 3;
+        public static float spawnRate = 7;
         public static int minimumSpawnsPerBurst = 2;
         public static int maximumSpawnsPerBurst = 3;
-        public static float spawnBurstGap = 30;
+        public static float spawnBurstGap = 25;
         public static bool useSpawnRateRandomiser = false;
     }
 
@@ -42,5 +43,26 @@
     {
         public static int secondsToStartTruck = 2;
         public static float reverseSpeedModifier = 1.5f;
+    }
+
+    // Truck defaults
+    public static class Parcel
+    {
+        public static Color flashHighlightColor = new Color(255f, 0f, 0f);
+        public static float flashSpeed = 0.5f;
+    }
+
+    // Conveyor belt
+    public static class ConveyorBelt
+    {
+        public static float aboutToDropParcelBuffer = 1.5f;
+    }
+
+    // Score constants
+    public static class Scores
+    {
+        public static int passedParcel = 10;
+        public static int parcelLoaded = 25;
+        public static int levelUp = 1000;
     }
 }

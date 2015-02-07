@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ParcelSpawner : MonoBehaviour 
 {
-	private float _nextSpawn = Defaults.ParcelSpawner.startSpawningBuffer;
+	private float _nextSpawn = Constants.ParcelSpawner.startSpawningBuffer;
 	private int _spawnCount;
     private int _spawnCountWhenWaveCompleted;
     private int _spawnsInCurrentWave;
@@ -38,7 +38,7 @@ public class ParcelSpawner : MonoBehaviour
                 SpawnParcel();
             } 
             // Check if it's time to alert that a spawn wave is iminent
-            else if (!_isWaveActive && !_alerting && Time.time > (_nextSpawn - Defaults.ParcelSpawner.spawnWaveAlertTime))
+            else if (!_isWaveActive && !_alerting && Time.time > (_nextSpawn - Constants.ParcelSpawner.spawnWaveAlertTime))
             {
                 ShowAlert();
             }
@@ -96,7 +96,7 @@ public class ParcelSpawner : MonoBehaviour
         _spawnCountWhenWaveCompleted = 0;
         _nextSpawnPauseBuffer = 0;
         _isWaveActive = false;
-        _nextSpawn = Time.time + Defaults.ParcelSpawner.startSpawningBuffer;
+        _nextSpawn = Time.time + Constants.ParcelSpawner.startSpawningBuffer;
         HideAlert();
     }
 
@@ -125,12 +125,12 @@ public class ParcelSpawner : MonoBehaviour
     IEnumerator FlashAlert()
     {
         // Iterate through the pause length to hold the game
-        for (float i = 0; i < Defaults.ParcelSpawner.spawnWaveAlertTime; i += Defaults.ParcelSpawner.spawnAlertBlinkSpeed)
+        for (float i = 0; i < Constants.ParcelSpawner.spawnWaveAlertTime; i += Constants.ParcelSpawner.spawnAlertBlinkSpeed)
         {
             // Update the hud
             _parcelAlert.renderer.enabled = !_parcelAlert.renderer.enabled;
 
-            yield return new WaitForSeconds(Defaults.ParcelSpawner.spawnAlertBlinkSpeed);
+            yield return new WaitForSeconds(Constants.ParcelSpawner.spawnAlertBlinkSpeed);
         }
     }
 
@@ -144,7 +144,8 @@ public class ParcelSpawner : MonoBehaviour
         }        
 
         // Create a new parcel
-        Instantiate(_parcel, transform.position, transform.rotation);
+        GameObject newParcel = (GameObject)Instantiate(_parcel, transform.position, transform.rotation);
+        newParcel.name = "Parcel " + _spawnCount.ToString();
 
         // Increment spawn count
         _spawnCount += 1;        
@@ -170,7 +171,7 @@ public class ParcelSpawner : MonoBehaviour
     void EndCurrentWave()
     {
         // Decrement the spawn wave gap so the waves get progressively closer together
-        SpawnWaveGap -= Defaults.ParcelSpawner.reduceSpawnWaveGapModifier;
+        SpawnWaveGap -= Constants.ParcelSpawner.reduceSpawnWaveGapModifier;
 
         // Set the flag for an active wave to false
         _isWaveActive = false;

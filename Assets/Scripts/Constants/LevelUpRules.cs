@@ -14,7 +14,7 @@
     public static float spawnRateModifier = 0.125f;
 
     // Maximum spawns per burst rules
-    public static int levelsPerMaximumSpawnsPerBurstIncrease = 2;
+    public static int levelsPerMaximumSpawnsPerBurstIncrease = 1;
     public static int maxMaximumSpawnsPerBurst = int.MaxValue;
     public static int maximumSpawnsPerBurstModifier = 1;
 
