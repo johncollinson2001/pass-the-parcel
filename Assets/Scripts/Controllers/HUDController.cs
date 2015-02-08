@@ -1,31 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class HUDController : MonoBehaviour 
 {
-    private bool _showGameOverText;
-    private bool _showLevelCompletedText;
-    private bool _showLifeLostText;
-
 	public GUIText _livesRemainingText;
     public GUIText _levelText;
     public GUIText _truckCapacityText;
     public GUIText _parcelLoadedOnTruckText;
     public GUIText _scoreText;
-    public GUIText _gameOverText;
-    public GUIText _levelCompletedText;
-    public GUIText _lifeLostText;
-    public GUIText _countdownText;
+
+    public Canvas _panelCanvas;
+    public Text _panelTitleText;
+    public Text _panelContentText;
+    public Text _countdownText;
 
     public GameManager _gameManager;
 
 	#region Mono Behaviours
-
-	void Awake()
-	{
-        _countdownText.text = string.Empty;
-	}
 
     void Update()
     {
@@ -86,27 +79,19 @@ public class HUDController : MonoBehaviour
     { 
         if(changedTo == GameState.Active)
         {
-            _showGameOverText = false;
-            _showLevelCompletedText = false;
-            _showLifeLostText = false;
+            HidePanel();
         }
         else if (changedTo == GameState.LevelCompleted)
         {
-            _showGameOverText = false;
-            _showLevelCompletedText = true;
-            _showLifeLostText = false;
+            ShowLevelCompletedPanel();
         }
         else if (changedTo == GameState.LostLife)
         {
-            _showGameOverText = false;
-            _showLevelCompletedText = false;
-            _showLifeLostText = true;
+            ShowLostLifePanel();
         }
         else if (changedTo == GameState.GameOver)
         {
-            _showGameOverText = true;
-            _showLevelCompletedText = false;
-            _showLifeLostText = false;
+            ShowGameOverPanel();
         }
     }
 
@@ -118,50 +103,43 @@ public class HUDController : MonoBehaviour
         _truckCapacityText.text = string.Format(HudText.truckCapacity, LevelManager.Instance.CurrentLevel.TruckCapacity);
         _parcelLoadedOnTruckText.text = string.Format(HudText.parcelsLoadedOnTruck, _gameManager.ParcelsLoadedOnCurrentTruck);
         _scoreText.text = string.Format(HudText.score, ScoreManager.Instance.CurrentScore);
-
-        WriteGameOverText();
-        WriteLevelCompletedTextToScreen();
-        WriteLifeLostTextToScreen();
 	}
 
-    // Writes the game over text
-    void WriteGameOverText()
+    // Hides the panel
+    void HidePanel()
     {
-        if (_showGameOverText)
-        {
-            _gameOverText.text = HudText.gameOver;
-        }
-        else
-        {
-            _gameOverText.text = string.Empty;
-        }
+        _panelCanvas.enabled = false;
     }
 
-    // Writes the level up text to the screen
-    void WriteLevelCompletedTextToScreen()
+    // Shows the panel
+    void ShowPanel(string title, string content)
     {
-        if (_showLevelCompletedText)
-        {
-            _levelCompletedText.text = string.Format(HudText.levelCompleted, LevelManager.Instance.CurrentLevel.LevelNumber.ToString(), (LevelManager.Instance.CurrentLevel.LevelNumber + 1).ToString());
-        }
-        else
-        {
-            _levelCompletedText.text = string.Empty;
-        }
+        _panelTitleText.text = title;
+        _panelContentText.text = content;
+
+        _panelCanvas.enabled = true;
     }
 
-    // Writes the life lost text to the screen
-    void WriteLifeLostTextToScreen()
+    // Shows the level completed panel 
+    void ShowLevelCompletedPanel()
     {
-        if (_showLifeLostText)
-        {
-            _lifeLostText.text = string.Format(HudText.lostLife, _gameManager.LivesRemaining);
-        }
-        else
-        {
-            _lifeLostText.text = string.Empty;
-        }
-    }   
+        ShowPanel(
+            HudText.levelCompletedTitle, 
+            string.Format(HudText.levelCompleted, LevelManager.Instance.CurrentLevel.LevelNumber.ToString(), (LevelManager.Instance.CurrentLevel.LevelNumber + 1).ToString())
+        );
+    }
+
+    // Shows the level completed panel 
+    void ShowLostLifePanel()
+    {
+        ShowPanel(HudText.lostLifeTitle, string.Format(HudText.lostLife, _gameManager.LivesRemaining));
+    }
+
+    // Shows the level completed panel 
+    void ShowGameOverPanel()
+    {
+        ShowPanel(HudText.gameOverTitle, HudText.gameOver);
+    }
     
 	#endregion
 }

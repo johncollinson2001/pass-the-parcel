@@ -84,12 +84,12 @@ public class EventManager
     }
 
     // Level Up event
-    public event Action<LevelModel, LevelModel> LevelUp;
-    public void TriggerLevelUp(LevelModel previousLevel, LevelModel nextLevel)
+    public event Action<LevelModel> LevelUp;
+    public void TriggerLevelUp(LevelModel nextLevel)
     {
         if (LevelUp != null)
         {
-            LevelUp(previousLevel, nextLevel);
+            LevelUp(nextLevel);
         }
     }
 }

@@ -190,6 +190,10 @@ public class GameManager : MonoBehaviour
         // Pause the game
         PauseGame();
 
+        // Make the workers take their break
+        _workerLeft.GetComponent<WorkerController>().TakeBreak();
+        _workerRight.GetComponent<WorkerController>().TakeBreak();
+
         // Get the HUD to display a countdown
         _hudController.ShowCountdown(Constants.Game.levelUpPauseLength, Constants.Game.levelUpCountdownLength);
 
@@ -213,9 +217,6 @@ public class GameManager : MonoBehaviour
     // Starts the next level
     void StartNextLevel()
     {
-        // Pull out the current level we are moving from to pass in the event
-        var previousLevel = LevelManager.Instance.CurrentLevel;
-
         // Up the level
         LevelManager.Instance.LevelUp();
 
@@ -225,11 +226,15 @@ public class GameManager : MonoBehaviour
         // Reset counter
         ParcelsLoadedOnCurrentTruck = 0;
 
+        // Make the workers get back to work
+        _workerLeft.GetComponent<WorkerController>().GetBackToWork();
+        _workerRight.GetComponent<WorkerController>().GetBackToWork();
+
         // Unpause the game
         UnpauseGame();
 
         // Trigger the level up event
-        EventManager.Instance.TriggerLevelUp(previousLevel, LevelManager.Instance.CurrentLevel);
+        EventManager.Instance.TriggerLevelUp(LevelManager.Instance.CurrentLevel);
     }
 
     // Apply level settings to game 
@@ -264,7 +269,7 @@ public class GameManager : MonoBehaviour
         if(CurrentState == GameState.Active)
         {
             CurrentState = GameState.Paused;
-        }
+        }        
 
         // Pause the parcel spawner
         _parcelSpawner.PauseSpawning();

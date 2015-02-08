@@ -49,10 +49,10 @@ public class ScoreManager
         CurrentScore += Constants.Scores.passedParcel * LevelManager.Instance.CurrentLevel.LevelNumber;
     }
 
-    void RegisterScoreForLevelUp(LevelModel previousLevel, LevelModel nextLevel)
+    void RegisterScoreForLevelUp(LevelModel nextLevel)
     {
         // For a level up, user gets X points multiplied by the level they are on
-        CurrentScore += Constants.Scores.levelUp * previousLevel.LevelNumber;
+        CurrentScore += Constants.Scores.levelUp * (nextLevel.LevelNumber - 1);
     }
 
     void RegisterScoreForParcelLoaded()

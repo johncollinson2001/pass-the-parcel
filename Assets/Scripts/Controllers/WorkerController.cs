@@ -105,6 +105,18 @@ public class WorkerController : MonoBehaviour
         MoveWorker(_currentPlatform.GetComponent<PlatformController>()._platformLevel);
     }
 
+    // Makes the worker take a break
+    public void TakeBreak()
+    {
+        _animator.SetBool("take-break", true);
+    }
+
+    // Makes the worker get back to work
+    public void GetBackToWork()
+    {
+        _animator.SetBool("take-break", false);
+    }
+
     #endregion
 
     #region Private Methods
@@ -152,7 +164,7 @@ public class WorkerController : MonoBehaviour
     {
         if(_animator != null)
         {
-            _animator.SetBool("walk", false);
+            _animator.SetBool("take-break", false);
             _animator.SetBool("dead", false);
             _animator.SetBool("jump", false);
         }
@@ -188,9 +200,6 @@ public class WorkerController : MonoBehaviour
 		// that can be received from
 		if (conveyorBelt == receiveFromConveyor)
 		{                
-            // Set the animation of the sprite
-            _animator.SetBool("passing", true);
-
             // Get the conveyor belt that can be passed to from the platform the worker is standing on
             GameObject passToConveyor = _currentPlatform.GetComponent<PlatformController>()._passToConveyor;
 
@@ -214,9 +223,6 @@ public class WorkerController : MonoBehaviour
 			{
 				PassParcelToNextConveyor(parcel);
 			}                            
-
-            // Set animation state
-            _animator.SetBool("passing", false);
 		}
 	}
 

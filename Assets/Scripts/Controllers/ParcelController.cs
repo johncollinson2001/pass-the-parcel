@@ -4,10 +4,12 @@ using System.Collections;
 public class ParcelController : MonoBehaviour 
 {
     private bool _flashing;
+    private bool _isHighlighted;
     private Color _originalColor;
 	private int _platformLayer;
 	private int _workerLayer;
-	private int _parcelLayer;	
+	private int _parcelLayer;
+    private GameObject _conveyorBelt;
 
     public ParcelState State { get; set; }
 
@@ -53,6 +55,12 @@ public class ParcelController : MonoBehaviour
 			// Raise an event to let others know that a parcel has been dropped
 			EventManager.Instance.TriggerParcelBroken();            
 		}
+
+        // Keep a record of the conveyor belt the parcel is travelling on
+        if (collision.gameObject.tag == Tags.conveyorBelt)
+        {
+            _conveyorBelt = collision.gameObject;
+        }
 	}
 
     #endregion
@@ -90,36 +98,49 @@ public class ParcelController : MonoBehaviour
 
     IEnumerator Flash()
     {
-        bool isHighlighted = false;
-
         while(_flashing)
         {
-            // Manage the flash on/off
-            if (!isHighlighted)
+            // Check to see if the conveyor has a worker waiting to pass
+            if (_conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceive())
             {
-                GetComponent<SpriteRenderer>().color = Constants.Parcel.flashHighlightColor;                
+                ClearHighlight();
             }
             else
             {
-                GetComponent<SpriteRenderer>().color = _originalColor;
-            }
+                // Manage the flash on/off
+                if (!_isHighlighted)
+                {
+                    GetComponent<SpriteRenderer>().color = Constants.Parcel.flashHighlightColor;
+                }
+                else
+                {
+                    GetComponent<SpriteRenderer>().color = _originalColor;
+                }
 
-            isHighlighted = !isHighlighted;
+                _isHighlighted = !_isHighlighted;
+            }
 
             yield return new WaitForSeconds(Constants.Parcel.flashSpeed);
         }
 
-        // Return the parcel to its original color if it's still highlighted
-        if(isHighlighted)
-        {
-            GetComponent<SpriteRenderer>().color = _originalColor;
-        }
+        // Clears the highlight from the parcel
+        ClearHighlight();
     }
 
     // Stops the parcel flashing
     void StopFlashing()
     {
         _flashing = false;
+    }
+
+    // Clears the highlight from the parcel
+    void ClearHighlight()
+    {
+        if (_isHighlighted)
+        {
+            GetComponent<SpriteRenderer>().color = _originalColor;
+            _isHighlighted = false;
+        }
     }
 
     #endregion

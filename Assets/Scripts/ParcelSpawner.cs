@@ -164,7 +164,16 @@ public class ParcelSpawner : MonoBehaviour
         {
             // Spawning as part of a wave.. start the next spawn at the spawn rate
             // if specified by the flag, chuck in some randomness to make things interesting
-            _nextSpawn = Time.time + (SpawnRate + (UseSpawnRateRandomiser ? Random.Range(0, SpawnRate) : 0f));
+            if (UseSpawnRateRandomiser)
+            {
+                // Randomise between range of the spawn rate i.e...
+                // if spawn rate = 5, randomise between 2.5 and 7.5
+                _nextSpawn = Time.time + Random.Range(SpawnRate / 2f, SpawnRate * 1.5f);
+            }
+            else
+            {
+                _nextSpawn = Time.time + SpawnRate;
+            }
         }	
     }
 

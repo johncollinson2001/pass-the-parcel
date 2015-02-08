@@ -5,12 +5,13 @@ using System.Collections.Generic;
 public class ConveyorBeltController : MonoBehaviour
 {
     private const float BASE_PARCEL_MOVEMENT = 0.01f;
-    private bool _operational = true;
+
+    private bool _operational;    
     private List<GameObject> _cogs = new List<GameObject>();
     private List<GameObject> _parcels = new List<GameObject>();
 
-    public ScreenSide _travellingTo = ScreenSide.Left;
-    public float _speed = 2;	
+    public ScreenSide _travellingTo;
+    public float _speed;	
     
     private bool IsParcelOnBelt
     {
@@ -20,7 +21,7 @@ public class ConveyorBeltController : MonoBehaviour
     #region Mono Behaviours
 
     void Awake() 
-    {
+    {        
 	    // Set the cogs... Iterate over all children 
         foreach(Transform child in transform)
         {
@@ -78,6 +79,24 @@ public class ConveyorBeltController : MonoBehaviour
     #endregion
 
     #region Public Methods
+
+    // States whether there is a worker waiting to receive the parcel from this conveyor
+    public bool IsWorkerWaitingToReceive()
+    {
+        // Iterate over platforms
+        foreach (var platform in GameObject.FindGameObjectsWithTag(Tags.workerPlatform))
+        {
+            // See if the platforms receive from conveyor is this conveyor belt
+            // and if the platform has a worker standing on it
+            if(platform.GetComponent<PlatformController>()._receiveFromConveyor == gameObject
+                && platform.GetComponent<PlatformController>().HasWorker)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     // Starts the conveyor belt
     public void StartConveyorBelt()
