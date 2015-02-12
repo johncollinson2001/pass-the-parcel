@@ -6,7 +6,8 @@ public class GameManager : MonoBehaviour
 {
     private GameState _currentState;
 
-    public HUDController _hudController;    
+    public PanelController _panelController;
+    public GameMenuController _gameMenuController;    
     public ParcelSpawner _parcelSpawner;
     public GameObject _workerLeft;
     public GameObject _workerRight;
@@ -31,8 +32,7 @@ public class GameManager : MonoBehaviour
 
 	void Start()
 	{
-		// Start the game
-        StartNewGame();
+        CurrentState = GameState.Inactive;
 	}
 
     void OnEnable()
@@ -60,8 +60,47 @@ public class GameManager : MonoBehaviour
         // Start the game
         ActivateGameObjects();
 
+        // Close game menu
+        CloseGameMenu();        
+
         // Set game state
         CurrentState = GameState.Active;
+    }
+
+    // Opens the game menu and pauses the game
+    public void OpenGameMenu()
+    {
+        // Pause the game if it is active
+        if (CurrentState == GameState.Active)
+        {
+            PauseGame();
+        }
+
+        _gameMenuController.OpenMenu(CurrentState == GameState.Paused);
+    }
+
+    // Closes the game menu and un pauses the game
+    public void CloseGameMenu()
+    {
+        _gameMenuController.CloseMenu();
+
+        // Unpause the game if it is paused
+        if (CurrentState == GameState.Paused)
+        {
+            UnpauseGame();
+        }
+    }
+
+    public void RestartAfterGameOver()
+    {
+        // Hide the panel 
+        _panelController.HidePanel();
+
+        // Set game state to inactive
+        CurrentState = GameState.Inactive;
+
+        // Open the game menu
+        _gameMenuController.OpenMenu(false);
     }
 
     #endregion
@@ -72,6 +111,7 @@ public class GameManager : MonoBehaviour
     void ResetGame()
     {
         // Reset game manager variables
+        CurrentState = GameState.Inactive;
         LivesRemaining = Constants.Game.startingLives;
         ParcelsLoadedTotal = 0;
         ParcelsLoadedOnCurrentTruck = 0;
@@ -136,8 +176,8 @@ public class GameManager : MonoBehaviour
         // Pause the game
         PauseGame();
 
-        // Get the HUD to display a countdown
-        _hudController.ShowCountdown(Constants.Game.lifeLostPauseLength, Constants.Game.lifeLostCountdownLength);
+        // show the lost life panel
+        _panelController.ShowLostLifePanel(Constants.Game.lifeLostPauseLength);
 
         // Kick off a coroutine to pause until the game starts again
         StartCoroutine(CountdownToRestartLevelFollowingLostLife());
@@ -159,6 +199,9 @@ public class GameManager : MonoBehaviour
     // Starts the next level
     void RestartLevelFollowingLostLife()
     {
+        // Hide the panel 
+        _panelController.HidePanel();
+
         // Unpause the game
         UnpauseGame();
     }
@@ -194,8 +237,8 @@ public class GameManager : MonoBehaviour
         _workerLeft.GetComponent<WorkerController>().TakeBreak();
         _workerRight.GetComponent<WorkerController>().TakeBreak();
 
-        // Get the HUD to display a countdown
-        _hudController.ShowCountdown(Constants.Game.levelUpPauseLength, Constants.Game.levelUpCountdownLength);
+        // Get the panel to display 
+        _panelController.ShowLevelCompletedPanel(Constants.Game.levelUpPauseLength);        
 
         // Kick off a coroutine to pause until the next level starts
         StartCoroutine(CountdownToNextLevel());
@@ -221,14 +264,17 @@ public class GameManager : MonoBehaviour
         LevelManager.Instance.LevelUp();
 
         // Apply the level settings to the game
-        ApplyLevelSettingsToGame();
-
-        // Reset counter
-        ParcelsLoadedOnCurrentTruck = 0;
+        ApplyLevelSettingsToGame();        
 
         // Make the workers get back to work
         _workerLeft.GetComponent<WorkerController>().GetBackToWork();
         _workerRight.GetComponent<WorkerController>().GetBackToWork();
+
+        // Reset counter
+        ParcelsLoadedOnCurrentTruck = 0;
+
+        // Hide the panel 
+        _panelController.HidePanel();
 
         // Unpause the game
         UnpauseGame();
@@ -253,6 +299,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Ends the game
 	void EndGame()
 	{
         // Set game state
@@ -260,6 +307,9 @@ public class GameManager : MonoBehaviour
 
 		// Pause the game
         PauseGame();
+
+        // Show the game over panel
+        _panelController.ShowGameOverPanel();
     }
 
     // Pauses the game

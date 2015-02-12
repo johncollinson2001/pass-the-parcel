@@ -13,7 +13,7 @@ public class ConveyorBeltController : MonoBehaviour
     public ScreenSide _travellingTo;
     public float _speed;	
     
-    private bool IsParcelOnBelt
+    public bool IsParcelOnBelt
     {
         get { return _parcels.Count > 0;  }
     }
@@ -56,10 +56,6 @@ public class ConveyorBeltController : MonoBehaviour
         }
     }
 
-
-    // investigate if you can get a final on collision exit - when the whole object has left the conveyor
-    // or could try to set the rotation/physics force on the parcel when its passed so it doesnt tip over?
-
     void OnCollisionExit2D(Collision2D collision)
     {
         // Test to see if the collision was with a parcel
@@ -78,25 +74,7 @@ public class ConveyorBeltController : MonoBehaviour
 
     #endregion
 
-    #region Public Methods
-
-    // States whether there is a worker waiting to receive the parcel from this conveyor
-    public bool IsWorkerWaitingToReceive()
-    {
-        // Iterate over platforms
-        foreach (var platform in GameObject.FindGameObjectsWithTag(Tags.workerPlatform))
-        {
-            // See if the platforms receive from conveyor is this conveyor belt
-            // and if the platform has a worker standing on it
-            if(platform.GetComponent<PlatformController>()._receiveFromConveyor == gameObject
-                && platform.GetComponent<PlatformController>().HasWorker)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    #region Public Methods    
 
     // Starts the conveyor belt
     public void StartConveyorBelt()
@@ -148,6 +126,24 @@ public class ConveyorBeltController : MonoBehaviour
         }
 
         _parcels.Clear();
+    }
+
+    // States whether there is a worker waiting to receive the parcel from this conveyor
+    public bool IsWorkerWaitingToReceiveParcel()
+    {
+        // Iterate over platforms
+        foreach (var platform in GameObject.FindGameObjectsWithTag(Tags.workerPlatform))
+        {
+            // See if the platforms receive from conveyor is this conveyor belt
+            // and if the platform has a worker standing on it
+            if (platform.GetComponent<PlatformController>()._receiveFromConveyor == gameObject
+                && platform.GetComponent<PlatformController>().HasWorker)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #endregion

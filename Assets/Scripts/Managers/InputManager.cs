@@ -5,6 +5,7 @@ public class InputManager : MonoBehaviour
     public GameManager _gameManager; 
     public GameObject _workerLeft;
     public GameObject _workerRight;
+    public GameObject _menuButton;
 
     #region Mono Behaviours
 
@@ -13,12 +14,42 @@ public class InputManager : MonoBehaviour
         HandleInputForWorkerLeft();
         HandleInputForWorkerRight();
         HandleInputToRestartGame();
+        HandleInputToOpenGameMenu();
         //HandleInputToSpeedGameUp();
     }    
 
     #endregion
 
+    #region Public Methods
+
+    // Handles a click on the quit button from the game menu
+    public void GameMenu_StartNewGame_Click()
+    {
+        _gameManager.StartNewGame();
+    }
+
+    // Handles a click on the resume button of the game menu
+    public void GameMenu_Resume_Click()
+    {
+        _gameManager.CloseGameMenu();
+    }
+
+    #endregion
+
     #region Private Methods
+
+    // Handles the game menu button click
+    void HandleInputToOpenGameMenu()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (hit.collider != null && hit.collider.gameObject == _menuButton)
+            {                
+                _gameManager.OpenGameMenu();
+            }
+        }
+    }
 
     // Handles the input that will restart the game
     void HandleInputToRestartGame()
@@ -30,7 +61,7 @@ public class InputManager : MonoBehaviour
             if (Input.GetKeyDown(Controls.gameRestart))
             {
                 // Start a new game
-                _gameManager.StartNewGame();
+                _gameManager.RestartAfterGameOver();
             }
         }
     }

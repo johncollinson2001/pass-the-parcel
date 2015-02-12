@@ -56,22 +56,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Constants\Controls.cs" />
     <Compile Include="Assets\Scripts\Constants\Constants.cs" />
+    <Compile Include="Assets\Scripts\Constants\Controls.cs" />
+    <Compile Include="Assets\Scripts\Constants\GameMenuText.cs" />
+    <Compile Include="Assets\Scripts\Constants\HudText.cs" />
     <Compile Include="Assets\Scripts\Constants\Layers.cs" />
     <Compile Include="Assets\Scripts\Constants\LevelUpRules.cs" />
-    <Compile Include="Assets\Scripts\Constants\HudText.cs" />
+    <Compile Include="Assets\Scripts\Constants\PanelText.cs" />
     <Compile Include="Assets\Scripts\Constants\Tags.cs" />
     <Compile Include="Assets\Scripts\Controllers\ConveyorBeltController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\GameMenuController.cs" />
     <Compile Include="Assets\Scripts\Controllers\HUDController.cs" />
-    <Compile Include="Assets\Scripts\Controllers\TruckController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\PanelController.cs" />
     <Compile Include="Assets\Scripts\Controllers\ParcelController.cs" />
     <Compile Include="Assets\Scripts\Controllers\PlatformController.cs" />
     <Compile Include="Assets\Scripts\Controllers\RotationController.cs" />
+    <Compile Include="Assets\Scripts\Controllers\TruckController.cs" />
     <Compile Include="Assets\Scripts\Controllers\WorkerController.cs" />
     <Compile Include="Assets\Scripts\DebugWriter.cs" />
-    <Compile Include="Assets\Scripts\Enums\ParcelState.cs" />
     <Compile Include="Assets\Scripts\Enums\GameState.cs" />
+    <Compile Include="Assets\Scripts\Enums\ParcelState.cs" />
     <Compile Include="Assets\Scripts\Enums\PlatformLevel.cs" />
     <Compile Include="Assets\Scripts\Enums\RotationDirection.cs" />
     <Compile Include="Assets\Scripts\Enums\ScreenSide.cs" />
@@ -79,10 +83,14 @@
     <Compile Include="Assets\Scripts\Managers\EventManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Managers\LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
+    <Compile Include="Assets\Scripts\Models\HighScoresModel.cs" />
     <Compile Include="Assets\Scripts\Models\LevelModel.cs" />
     <Compile Include="Assets\Scripts\ParcelSpawner.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Data\HighScore.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

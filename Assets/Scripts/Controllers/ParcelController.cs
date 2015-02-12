@@ -101,7 +101,7 @@ public class ParcelController : MonoBehaviour
         while(_flashing)
         {
             // Check to see if the conveyor has a worker waiting to pass
-            if (_conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceive())
+            if (_conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel())
             {
                 ClearHighlight();
             }

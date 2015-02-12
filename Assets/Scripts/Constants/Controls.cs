@@ -7,5 +7,5 @@ public static class Controls
     public static KeyCode workerRight_UpKey = KeyCode.K;
     public static KeyCode workerRight_DownKey = KeyCode.M;
     public static KeyCode gameRestart = KeyCode.Space;
-    public static KeyCode gameSpeedUp = KeyCode.S;
+    //public static KeyCode gameSpeedUp = KeyCode.S;
 }
