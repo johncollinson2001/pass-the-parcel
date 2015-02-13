@@ -64,4 +64,10 @@ public static class Constants
         public static int levelUp = 1000;
         public static string highScoreXmlPath = @"Assets\Data\HighScore.xml";
     }
+
+    // Background
+    public static class Background
+    {
+        public static int LevelsPerBackgroundChange = 4;        
+    }
 }

@@ -2,7 +2,7 @@
 
 public class InputManager : MonoBehaviour
 {
-    public GameManager _gameManager; 
+    public GameMenuManager _gameMenuManager; 
     public GameObject _workerLeft;
     public GameObject _workerRight;
     public GameObject _menuButton;
@@ -25,13 +25,13 @@ public class InputManager : MonoBehaviour
     // Handles a click on the quit button from the game menu
     public void GameMenu_StartNewGame_Click()
     {
-        _gameManager.StartNewGame();
+        _gameMenuManager.StartNewGameClickHandler();
     }
 
     // Handles a click on the resume button of the game menu
     public void GameMenu_Resume_Click()
     {
-        _gameManager.CloseGameMenu();
+        _gameMenuManager.ResumeButtonClickHandler();
     }
 
     #endregion
@@ -46,7 +46,7 @@ public class InputManager : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
             if (hit.collider != null && hit.collider.gameObject == _menuButton)
             {                
-                _gameManager.OpenGameMenu();
+                _gameMenuManager.InGameMenuButtonClickHandler();
             }
         }
     }
@@ -54,16 +54,12 @@ public class InputManager : MonoBehaviour
     // Handles the input that will restart the game
     void HandleInputToRestartGame()
     {
-        // Check the game is in game over state
-        if(_gameManager.CurrentState == GameState.GameOver)
-        {
             // Look for user pressing the space bar key
             if (Input.GetKeyDown(Controls.gameRestart))
             {
                 // Start a new game
-                _gameManager.RestartAfterGameOver();
+                _gameMenuManager.RestartAfterGameOverClickHandler();
             }
-        }
     }
 
     // Applys input (if any) to the left worker

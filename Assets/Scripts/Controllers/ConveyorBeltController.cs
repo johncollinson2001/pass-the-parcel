@@ -6,17 +6,14 @@ public class ConveyorBeltController : MonoBehaviour
 {
     private const float BASE_PARCEL_MOVEMENT = 0.01f;
 
-    private bool _operational;    
     private List<GameObject> _cogs = new List<GameObject>();
     private List<GameObject> _parcels = new List<GameObject>();
 
     public ScreenSide _travellingTo;
-    public float _speed;	
-    
-    public bool IsParcelOnBelt
-    {
-        get { return _parcels.Count > 0;  }
-    }
+    public float _speed;
+
+    public bool Operational { get; private set; }
+    public bool IsParcelOnBelt { get { return _parcels.Count > 0;  } }
 
     #region Mono Behaviours
 
@@ -36,7 +33,7 @@ public class ConveyorBeltController : MonoBehaviour
     void FixedUpdate()
     {
         // Check to see if the conveyors running and there's parcels on the belt
-        if(_operational && IsParcelOnBelt)
+        if(Operational && IsParcelOnBelt)
         {
             // Loop over parcels on the belt and move them
             foreach (GameObject parcel in _parcels)
@@ -97,7 +94,7 @@ public class ConveyorBeltController : MonoBehaviour
         }        
 
         // Set operational status member
-        _operational = true;
+        Operational = true;
     }
 
     // Stops the conveyor belt
@@ -114,7 +111,7 @@ public class ConveyorBeltController : MonoBehaviour
         }
 
         // Set operational status member
-        _operational = false;
+        Operational = false;
     }
 
     // Clears the parcels from the conveyor belt

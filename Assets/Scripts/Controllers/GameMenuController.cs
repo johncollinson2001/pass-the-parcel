@@ -7,16 +7,7 @@ public class GameMenuController : MonoBehaviour
 {
     public Canvas _gameMenuCanvas;
     public GameObject _resumeButton;
-    public Text _highScoreText;
-
-    #region Mono Behaviours
-
-    void Awake()
-    {
-        OpenMenu(false);
-    }    
-
-    #endregion
+    public Text _highScoreText;    
 
     #region Public Methods
 

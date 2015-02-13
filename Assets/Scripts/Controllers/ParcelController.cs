@@ -29,17 +29,25 @@ public class ParcelController : MonoBehaviour
 
 	void FixedUpdate() 
 	{
+        // Parcel should ignore collisions with everything but conveyors and the ground
 		Physics2D.IgnoreLayerCollision (_parcelLayer, _platformLayer);
         Physics2D.IgnoreLayerCollision(_parcelLayer, _workerLayer);
         Physics2D.IgnoreLayerCollision(_parcelLayer, _parcelLayer);
 
-        if (!_flashing && State == ParcelState.AboutToDrop)
-        {
-            StartFlashing();
-        }
-        else if (_flashing && State != ParcelState.AboutToDrop)
+        // Handle flashing sequences
+        //
+        // Stop the flashing if...
+        if (_flashing && ( // the flashing flag is set to true and...
+            State != ParcelState.AboutToDrop // the parcel is not about to drop or...
+            || !_conveyorBelt.GetComponent<ConveyorBeltController>().Operational // the conveyor belt is not operational or...
+            || _conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // there is a worker waiting to receive the parcel
+        ))
         {
             StopFlashing();
+        }
+        else if (!_flashing && State == ParcelState.AboutToDrop)
+        {
+            StartFlashing();
         }
 	}
 
@@ -99,26 +107,19 @@ public class ParcelController : MonoBehaviour
     IEnumerator Flash()
     {
         while(_flashing)
-        {
-            // Check to see if the conveyor has a worker waiting to pass
-            if (_conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel())
+        {            
+            // Manage the flash on/off
+            if (!_isHighlighted)
             {
-                ClearHighlight();
+                GetComponent<SpriteRenderer>().color = Constants.Parcel.flashHighlightColor;
             }
             else
             {
-                // Manage the flash on/off
-                if (!_isHighlighted)
-                {
-                    GetComponent<SpriteRenderer>().color = Constants.Parcel.flashHighlightColor;
-                }
-                else
-                {
-                    GetComponent<SpriteRenderer>().color = _originalColor;
-                }
-
-                _isHighlighted = !_isHighlighted;
+                GetComponent<SpriteRenderer>().color = _originalColor;
             }
+            
+            // Reverse the highlighted flag
+            _isHighlighted = !_isHighlighted;            
 
             yield return new WaitForSeconds(Constants.Parcel.flashSpeed);
         }
@@ -131,6 +132,12 @@ public class ParcelController : MonoBehaviour
     void StopFlashing()
     {
         _flashing = false;
+
+        // Stop all coroutines immediately so the flashing stops instantly
+        StopAllCoroutines();
+
+        // Clear the highlight so the parcel is the original color
+        ClearHighlight();
     }
 
     // Clears the highlight from the parcel

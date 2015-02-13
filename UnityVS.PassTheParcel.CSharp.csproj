@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Constants\LevelUpRules.cs" />
     <Compile Include="Assets\Scripts\Constants\PanelText.cs" />
     <Compile Include="Assets\Scripts\Constants\Tags.cs" />
+    <Compile Include="Assets\Scripts\Controllers\BackgroundController.cs" />
     <Compile Include="Assets\Scripts\Controllers\ConveyorBeltController.cs" />
     <Compile Include="Assets\Scripts\Controllers\GameMenuController.cs" />
     <Compile Include="Assets\Scripts\Controllers\HUDController.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\Scripts\Enums\ScreenSide.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\Managers\EventManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\GameMenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
     <Compile Include="Assets\Scripts\Managers\LevelManager.cs" />

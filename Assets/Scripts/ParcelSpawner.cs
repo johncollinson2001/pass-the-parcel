@@ -15,6 +15,7 @@ public class ParcelSpawner : MonoBehaviour
     public GameObject _parcelAlert;
 
     public bool Operational { get; private set; }
+    public bool Paused { get; private set; }
 	public float SpawnRate { get; set; } 
     public int MinimumSpawnsPerWave { get; set; }
     public int MaximumSpawnsPerWave { get; set; }
@@ -26,7 +27,7 @@ public class ParcelSpawner : MonoBehaviour
 	void Update ()
 	{
 		// Check the spawner is operational
-		if (Operational)
+		if (Operational && !Paused)
 		{
             // Check if its time to spawn a parcel
             if (Time.time > _nextSpawn)
@@ -77,7 +78,8 @@ public class ParcelSpawner : MonoBehaviour
         // Set the next spawn to time + the buffer
         _nextSpawn = Time.time + _nextSpawnPauseBuffer;
 
-        StartSpawning();
+        // Set the paused flag
+        Paused = false;
     }
 
     // Stops the spawner
@@ -86,7 +88,8 @@ public class ParcelSpawner : MonoBehaviour
         // Set the pause buffer so we can add it back onto next spawn when the spawner is started again
         _nextSpawnPauseBuffer = _nextSpawn - Time.time;
 
-        StopSpawning();
+        // Set the paused flag
+        Paused = true;
     }
 
     // Resets the spawner including the next spawn, spawn count and wave values
@@ -97,6 +100,7 @@ public class ParcelSpawner : MonoBehaviour
         _nextSpawnPauseBuffer = 0;
         _isWaveActive = false;
         _nextSpawn = Time.time + Constants.ParcelSpawner.startSpawningBuffer;
+        Paused = false;
         HideAlert();
     }
 
@@ -119,6 +123,9 @@ public class ParcelSpawner : MonoBehaviour
     {
         _alerting = false;
         _parcelAlert.SetActive(false);
+
+        // Stop all coroutines incase we are half way through a flashing sequence
+        StopAllCoroutines();
     }
 
     // Makes the alert flash
@@ -126,9 +133,18 @@ public class ParcelSpawner : MonoBehaviour
     {
         // Iterate through the pause length to hold the game
         for (float i = 0; i < Constants.ParcelSpawner.spawnWaveAlertTime; i += Constants.ParcelSpawner.spawnAlertBlinkSpeed)
-        {
-            // Update the hud
-            _parcelAlert.renderer.enabled = !_parcelAlert.renderer.enabled;
+        {            
+            // If the game is paused, we need to pause the alert
+            if (Paused)
+            {
+                // This code will make the coroutine infinite until the game is unpaused
+                i -= Constants.ParcelSpawner.spawnAlertBlinkSpeed;
+            }
+            else
+            {
+                // Make the alert game object blink on/off
+                _parcelAlert.renderer.enabled = !_parcelAlert.renderer.enabled;
+            }
 
             yield return new WaitForSeconds(Constants.ParcelSpawner.spawnAlertBlinkSpeed);
         }

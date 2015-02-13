@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
-    private GameState _currentState;
+    private GameState _currentState = GameState.Inactive;
 
     public PanelController _panelController;
-    public GameMenuController _gameMenuController;    
     public ParcelSpawner _parcelSpawner;
     public GameObject _workerLeft;
     public GameObject _workerRight;
@@ -29,11 +28,6 @@ public class GameManager : MonoBehaviour
     }
 
 	#region Mono Behaviours
-
-	void Start()
-	{
-        CurrentState = GameState.Inactive;
-	}
 
     void OnEnable()
     {
@@ -60,55 +54,15 @@ public class GameManager : MonoBehaviour
         // Start the game
         ActivateGameObjects();
 
-        // Close game menu
-        CloseGameMenu();        
+        // Enable the parcel spawner
+        _parcelSpawner.StartSpawning();
 
         // Set game state
         CurrentState = GameState.Active;
-    }
-
-    // Opens the game menu and pauses the game
-    public void OpenGameMenu()
-    {
-        // Pause the game if it is active
-        if (CurrentState == GameState.Active)
-        {
-            PauseGame();
-        }
-
-        _gameMenuController.OpenMenu(CurrentState == GameState.Paused);
-    }
-
-    // Closes the game menu and un pauses the game
-    public void CloseGameMenu()
-    {
-        _gameMenuController.CloseMenu();
-
-        // Unpause the game if it is paused
-        if (CurrentState == GameState.Paused)
-        {
-            UnpauseGame();
-        }
-    }
-
-    public void RestartAfterGameOver()
-    {
-        // Hide the panel 
-        _panelController.HidePanel();
-
-        // Set game state to inactive
-        CurrentState = GameState.Inactive;
-
-        // Open the game menu
-        _gameMenuController.OpenMenu(false);
-    }
-
-    #endregion
-
-    #region Private Methods
+    }    
 
     // Resets the game to default values
-    void ResetGame()
+    public void ResetGame()
     {
         // Reset game manager variables
         CurrentState = GameState.Inactive;
@@ -142,8 +96,43 @@ public class GameManager : MonoBehaviour
         LevelManager.Instance.Reset();
 
         // Apply the level settings to the game
-        ApplyLevelSettingsToGame();        
+        ApplyCurrentLevelToGame();
+
+        // Hide the panel 
+        _panelController.HidePanel();
     }
+
+    // Pauses the game
+    public void PauseGame()
+    {
+        // Set game state
+        CurrentState = GameState.Paused;
+
+        // Pause the parcel spawner
+        _parcelSpawner.PauseSpawning();
+
+        // Deactivate the game objects
+        DeactivateGameObjects();
+    }
+
+    // Unpauses the game
+    public void UnpauseGame()
+    {
+        // Unpause the parcel spawner
+        _parcelSpawner.UnpauseSpawning();
+
+        // Active the game objects
+        ActivateGameObjects();
+
+        // Set game state
+        CurrentState = GameState.Active;
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    #region Dropped parcel event handler sequence
 
     // Handles the event of a worker dropping a parcel
 	void HandleDroppedParcel()
@@ -170,9 +159,6 @@ public class GameManager : MonoBehaviour
 
     void PauseForLostLife()
     {
-        // Set game state
-        CurrentState = GameState.LostLife;
-
         // Pause the game
         PauseGame();
 
@@ -206,6 +192,10 @@ public class GameManager : MonoBehaviour
         UnpauseGame();
     }
 
+    #endregion
+
+    #region Loaded parcel event handler sequence
+
     // Handles the event of a worker loading a parcel onto the truck
 	void HandleLoadedParcel()
 	{
@@ -227,9 +217,6 @@ public class GameManager : MonoBehaviour
     // Moves the worker to the next level
     void MoveToNextLevel()
     {
-        // Set game state
-        CurrentState = GameState.LevelCompleted;
-
         // Pause the game
         PauseGame();
 
@@ -264,7 +251,7 @@ public class GameManager : MonoBehaviour
         LevelManager.Instance.LevelUp();
 
         // Apply the level settings to the game
-        ApplyLevelSettingsToGame();        
+        ApplyCurrentLevelToGame();        
 
         // Make the workers get back to work
         _workerLeft.GetComponent<WorkerController>().GetBackToWork();
@@ -283,8 +270,10 @@ public class GameManager : MonoBehaviour
         EventManager.Instance.TriggerLevelUp(LevelManager.Instance.CurrentLevel);
     }
 
+    #endregion
+
     // Apply level settings to game 
-    void ApplyLevelSettingsToGame()
+    void ApplyCurrentLevelToGame()
     {
         // Apply the settings of the next level to the game objects
         _parcelSpawner.SpawnRate = LevelManager.Instance.CurrentLevel.SpawnRate;
@@ -305,41 +294,15 @@ public class GameManager : MonoBehaviour
         // Set game state
         CurrentState = GameState.GameOver;
 
-		// Pause the game
-        PauseGame();
+        // Deactivate the game objects
+        DeactivateGameObjects();
+
+        // Stop the parcel spawner
+        _parcelSpawner.StopSpawning();
 
         // Show the game over panel
         _panelController.ShowGameOverPanel();
-    }
-
-    // Pauses the game
-    void PauseGame()
-    {      
-        // Set game state
-        if(CurrentState == GameState.Active)
-        {
-            CurrentState = GameState.Paused;
-        }        
-
-        // Pause the parcel spawner
-        _parcelSpawner.PauseSpawning();
-
-        // Deactivate the game objects
-        DeactivateGameObjects();
     }    
-
-    // Unpauses the game
-    void UnpauseGame()
-    {        
-        // Unpause the parcel spawner
-        _parcelSpawner.UnpauseSpawning();
-
-        // Active the game objects
-        ActivateGameObjects();
-
-        // Set game state
-        CurrentState = GameState.Active;
-    }
 
     // Activates the game objects
     void ActivateGameObjects()
@@ -362,10 +325,7 @@ public class GameManager : MonoBehaviour
 
         // Enable the workers
         _workerLeft.GetComponent<WorkerController>().Active = true;
-        _workerRight.GetComponent<WorkerController>().Active = true;
-
-        // Enable the parcel spawner
-        _parcelSpawner.StartSpawning();
+        _workerRight.GetComponent<WorkerController>().Active = true;        
     }
 
     // Deactivates the game objects
@@ -388,10 +348,7 @@ public class GameManager : MonoBehaviour
 
         // Disable the workers
         _workerLeft.GetComponent<WorkerController>().Active = false;
-        _workerRight.GetComponent<WorkerController>().Active = false;
-
-        // Stop the parcel spawner
-        _parcelSpawner.StopSpawning();
+        _workerRight.GetComponent<WorkerController>().Active = false;        
     }
     
 	#endregion
