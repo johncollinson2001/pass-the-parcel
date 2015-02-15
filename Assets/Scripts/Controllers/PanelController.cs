@@ -38,7 +38,7 @@ public class PanelController : MonoBehaviour
     // Shows the level completed panel 
     public void ShowLostLifePanel(int countdownToGameRestart)
     {
-        ShowPanel(PanelText.lostLifeTitle, string.Format(PanelText.lostLife, _gameManager.LivesRemaining));
+        ShowPanel(PanelText.lostLifeTitle, string.Format(PanelText.lostLife, _gameManager.LivesRemaining, _gameManager.LivesRemaining == 1 ? "life" : "lives"));
 
         // Show the countdown
         ShowCountdown(countdownToGameRestart);

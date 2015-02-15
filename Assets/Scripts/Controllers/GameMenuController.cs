@@ -12,11 +12,12 @@ public class GameMenuController : MonoBehaviour
     #region Public Methods
 
     // Shows the level completed panel 
-    public void OpenMenu(bool showResumeButton)
+    public void OpenMenu(GameState gameState)
     {
         _gameMenuCanvas.enabled = true;
 
-        if(showResumeButton)
+        // Only show the resume button if the game is currently paused
+        if(gameState == GameState.Paused)
         {
             _resumeButton.SetActive(true);
         }
@@ -25,6 +26,7 @@ public class GameMenuController : MonoBehaviour
             _resumeButton.SetActive(false);
         }
 
+        // Set the high score text
         _highScoreText.text = string.Format(GameMenuText.highScore, ScoreManager.Instance.HighScore);
     }
 

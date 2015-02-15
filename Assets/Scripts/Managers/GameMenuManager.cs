@@ -11,7 +11,7 @@ public class GameMenuManager : MonoBehaviour
 
     void Awake()
     {
-        _gameMenuController.OpenMenu(false);
+        _gameMenuController.OpenMenu(_gameManager.CurrentState);
     }
 
     #endregion
@@ -35,7 +35,7 @@ public class GameMenuManager : MonoBehaviour
         _gameManager.PauseGame();
 
         // Open the game menu with the resume button
-        _gameMenuController.OpenMenu(true);
+        _gameMenuController.OpenMenu(_gameManager.CurrentState);
     }
 
     // Closes the game menu and un pauses the game
@@ -50,15 +50,11 @@ public class GameMenuManager : MonoBehaviour
     
     public void RestartAfterGameOverClickHandler()
     {
-        // Check the game is in game over state
-        if (_gameManager.CurrentState == GameState.GameOver)
-        {
-            // Reset the game
-            _gameManager.ResetGame();
-        }
+        // Reset the game
+        _gameManager.ResetGame();
 
         // Open the game menu
-        _gameMenuController.OpenMenu(false);
+        _gameMenuController.OpenMenu(_gameManager.CurrentState);
     }
 
 	#endregion
