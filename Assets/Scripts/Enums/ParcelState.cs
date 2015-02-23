@@ -3,5 +3,6 @@
     Travelling,
     AboutToDrop,
     Dropped,
-    Broken
+    Broken,
+    Loaded
 }

@@ -28,7 +28,6 @@ public class ScoreManager
                 EventManager.Instance.ParcelPassed += _instance.RegisterScoreForParcelPassed;
                 EventManager.Instance.ParcelLoaded += _instance.RegisterScoreForParcelLoaded;
                 EventManager.Instance.LevelUp += _instance.RegisterScoreForLevelUp;
-                EventManager.Instance.GameStateChanged += _instance.SetHighScore;
             }
 
             return _instance;
@@ -47,6 +46,21 @@ public class ScoreManager
         CurrentScore = 0;
     }
 
+    // Saves the high score the current score is higher
+    public void SetHighScore()
+    {
+        // If the score of this game > the current high score
+        if (HighScore < CurrentScore)
+        {
+            // Set the high score
+            HighScore = CurrentScore;
+
+            // Persist the high score
+            SaveHighScore();
+        }
+    }
+
+
     #endregion
 
     #region Private Methods
@@ -63,7 +77,7 @@ public class ScoreManager
         CurrentScore += Constants.Scores.levelUp * (nextLevel.LevelNumber - 1);
     }
 
-    void RegisterScoreForParcelLoaded()
+    void RegisterScoreForParcelLoaded(GameObject parcel)
     {
         // For a parcel loaded, user gets X points multiplied by the level they are on
         CurrentScore += Constants.Scores.parcelLoaded * LevelManager.Instance.CurrentLevel.LevelNumber;
@@ -97,23 +111,6 @@ public class ScoreManager
         }
         stream.Close();
     }
-
-    void SetHighScore(GameState changedFrom, GameState changedTo)
-    {
-        // Check for the end of a game
-        if(changedTo == GameState.GameOver)
-        {            
-            // If the score of this game > the current high score
-            if (HighScore < CurrentScore)
-            {
-                // Set the high score
-                HighScore = CurrentScore;
-
-                // Persist the high score
-                SaveHighScore();
-            }
-        }
-    }
-
+    
     #endregion
 }

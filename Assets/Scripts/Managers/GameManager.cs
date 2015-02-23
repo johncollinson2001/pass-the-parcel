@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     public PanelController _panelController;
     public ParcelSpawner _parcelSpawner;
+    public AIManager _ai;
     public GameObject _workerLeft;
     public GameObject _workerRight;
     public GameObject _truck;
@@ -16,28 +17,35 @@ public class GameManager : MonoBehaviour
     public int LivesRemaining { get; private set; }
     public int ParcelsLoadedTotal { get; private set; }
     public int ParcelsLoadedOnCurrentTruck { get; private set; }
+    public PlayerModel Player { get; set; }
 
     public GameState CurrentState
     {
         get { return _currentState; }
         private set
         {
-            EventManager.Instance.TriggerGameStateChanged(_currentState, value);
             _currentState = value;
+            
         }
     }
 
 	#region Mono Behaviours
 
+    void Start()
+    {
+        // Start a new game with the AI        
+        StartNewGame(new PlayerModel() { IsHuman = false });
+    }
+
     void OnEnable()
     {
-        EventManager.Instance.ParcelBroken += HandleDroppedParcel;
+        EventManager.Instance.ParcelBroken += HandleBrokenParcel;
 		EventManager.Instance.ParcelLoaded += HandleLoadedParcel;
     }
 
     void OnDisable()
     {
-        EventManager.Instance.ParcelBroken -= HandleDroppedParcel;
+        EventManager.Instance.ParcelBroken -= HandleBrokenParcel;
         EventManager.Instance.ParcelLoaded -= HandleLoadedParcel;
     }
 
@@ -46,8 +54,21 @@ public class GameManager : MonoBehaviour
     #region Public Methods
 
     // Starts a new game
-    public void StartNewGame()
+    public void StartNewGame(PlayerModel player)
     {
+        // Set the player
+        Player = player;
+
+        // Set the AI going if the player is not human
+        if(!player.IsHuman)
+        {
+            _ai.Activate();
+        }
+        else
+        {
+            _ai.Deactivate();
+        }
+
         // Reset the game
         ResetGame();        
 
@@ -135,7 +156,7 @@ public class GameManager : MonoBehaviour
     #region Dropped parcel event handler sequence
 
     // Handles the event of a worker dropping a parcel
-	void HandleDroppedParcel()
+	void HandleBrokenParcel(GameObject parcel)
 	{
         // Ensure the game has not already ended
         if (CurrentState == GameState.Active)
@@ -152,21 +173,27 @@ public class GameManager : MonoBehaviour
             else
             {
                 // Handle the loss of a worker life
-                PauseForLostLife();
+                TakeLife();
             }
         }
 	}
 
-    void PauseForLostLife()
+    void TakeLife()
     {
         // Pause the game
         PauseGame();
 
-        // show the lost life panel
-        _panelController.ShowLostLifePanel(Constants.Game.lifeLostPauseLength);
+        if (Player.IsHuman)
+        {
+            // show the lost life panel
+            _panelController.ShowLostLifePanel(Constants.Game.lifeLostPauseLength);
+        }
 
         // Kick off a coroutine to pause until the game starts again
         StartCoroutine(CountdownToRestartLevelFollowingLostLife());
+
+        // Trigger life lost event
+        EventManager.Instance.TriggerLifeLost();
     }
 
     // Counts down to the game restart used in a coroutine
@@ -197,7 +224,7 @@ public class GameManager : MonoBehaviour
     #region Loaded parcel event handler sequence
 
     // Handles the event of a worker loading a parcel onto the truck
-	void HandleLoadedParcel()
+    void HandleLoadedParcel(GameObject parcel)
 	{
 		// Increment loaded parcels counter
 		ParcelsLoadedTotal += 1;
@@ -224,8 +251,11 @@ public class GameManager : MonoBehaviour
         _workerLeft.GetComponent<WorkerController>().TakeBreak();
         _workerRight.GetComponent<WorkerController>().TakeBreak();
 
-        // Get the panel to display 
-        _panelController.ShowLevelCompletedPanel(Constants.Game.levelUpPauseLength);        
+        if (Player.IsHuman)
+        {
+            // Get the panel to display 
+            _panelController.ShowLevelCompletedPanel(Constants.Game.levelUpPauseLength);
+        }
 
         // Kick off a coroutine to pause until the next level starts
         StartCoroutine(CountdownToNextLevel());
@@ -300,8 +330,22 @@ public class GameManager : MonoBehaviour
         // Stop the parcel spawner
         _parcelSpawner.StopSpawning();
 
-        // Show the game over panel
-        _panelController.ShowGameOverPanel();
+        if (Player.IsHuman)
+        {
+            // Set the high score
+            ScoreManager.Instance.SetHighScore();
+
+            // Show the game over panel
+            _panelController.ShowGameOverPanel();
+        }
+        else
+        {
+            // Just start a new game is the player is not human
+            StartNewGame(new PlayerModel() { IsHuman = false });
+        }
+
+        // Trigger game over event
+        EventManager.Instance.TriggerGameOver();
     }    
 
     // Activates the game objects

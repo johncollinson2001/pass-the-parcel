@@ -5,7 +5,7 @@ using System.Text;
 
 public enum PlatformLevel
 {
-    Top,
-    Middle,
-    Bottom
+    Bottom = 0,
+    Middle = 1,
+    Top = 2
 }

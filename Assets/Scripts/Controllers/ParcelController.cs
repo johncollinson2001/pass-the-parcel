@@ -9,8 +9,8 @@ public class ParcelController : MonoBehaviour
 	private int _platformLayer;
 	private int _workerLayer;
 	private int _parcelLayer;
-    private GameObject _conveyorBelt;
 
+    public GameObject ConveyorBelt { get; set; }
     public ParcelState State { get; set; }
 
 	#region Mono Behaviours
@@ -40,8 +40,8 @@ public class ParcelController : MonoBehaviour
         if (_flashing // the parcel is currently flashing...
             && ( // and...
                 State != ParcelState.AboutToDrop // the parcel is not about to drop...
-                || !_conveyorBelt.GetComponent<ConveyorBeltController>().Operational // or the conveyor belt is not operational...
-                || _conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // or there is a worker waiting to receive the parcel
+                || !ConveyorBelt.GetComponent<ConveyorBeltController>().Operational // or the conveyor belt is not operational...
+                || ConveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // or there is a worker waiting to receive the parcel
             ))
         {
             StopFlashing();
@@ -49,8 +49,8 @@ public class ParcelController : MonoBehaviour
         // Start flashing if...
         else if (!_flashing // The parcel is not already flashing...
             && State == ParcelState.AboutToDrop // and the parcel is about to drop...
-            && _conveyorBelt.GetComponent<ConveyorBeltController>().Operational // and the conveyor belt is operational...
-            && !_conveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // and there's no work waiting to receive the parcel
+            && ConveyorBelt.GetComponent<ConveyorBeltController>().Operational // and the conveyor belt is operational...
+            && !ConveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // and there's no work waiting to receive the parcel
         )
         {
             StartFlashing();
@@ -63,17 +63,15 @@ public class ParcelController : MonoBehaviour
         // and has not already been marked as dropped
 		if (collision.gameObject.tag != Tags.conveyorBelt && State == ParcelState.Dropped) 
 		{
-			// Set the parcels state as broken
+			// Set the parcels state as broken and raise game event
             State = ParcelState.Broken;
-
-			// Raise an event to let others know that a parcel has been dropped
-			EventManager.Instance.TriggerParcelBroken();            
+            EventManager.Instance.TriggerParcelBroken(gameObject);
 		}
 
         // Keep a record of the conveyor belt the parcel is travelling on
         if (collision.gameObject.tag == Tags.conveyorBelt)
         {
-            _conveyorBelt = collision.gameObject;
+            ConveyorBelt = collision.gameObject;
         }
 	}
 

@@ -6,7 +6,7 @@ public static class Constants
     {
         public static int startingLives = 3;
         public static int levelUpPauseLength = 10;
-        public static int lifeLostPauseLength = 10;
+        public static int lifeLostPauseLength = 3;
     }
 
     // Game start level defaults

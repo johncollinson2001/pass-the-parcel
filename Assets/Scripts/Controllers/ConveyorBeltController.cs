@@ -61,11 +61,9 @@ public class ConveyorBeltController : MonoBehaviour
             // Remove the parcel from the list
             _parcels.Remove(collision.gameObject);
 
-            // Drop the parcel
+            // Drop the parcel and raise game event
             collision.gameObject.GetComponent<ParcelController>().State = ParcelState.Dropped;
-
-			// Trigger an event to shout to the world that the parcel is falling
-			EventManager.Instance.TriggerParcelDropped(this.gameObject, collision.gameObject);
+            EventManager.Instance.TriggerParcelDropped(collision.gameObject);            
         }
     }
 
@@ -181,10 +179,12 @@ public class ConveyorBeltController : MonoBehaviour
                 + (parcelWidth / 2)
                 + Constants.ConveyorBelt.aboutToDropParcelBuffer;
 
-            if (parcel.GetComponent<ParcelController>().State != ParcelState.Dropped
+            if (parcel.GetComponent<ParcelController>().State == ParcelState.Travelling
                 && parcel.transform.position.x < aboutToDropX)
             {
+                // Set state and raise game event
                 parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+                EventManager.Instance.TriggerParcelAboutToDrop(parcel);
             }
         }
         else
@@ -195,10 +195,12 @@ public class ConveyorBeltController : MonoBehaviour
                 - (parcelWidth / 2)
                 - Constants.ConveyorBelt.aboutToDropParcelBuffer;
 
-            if (parcel.GetComponent<ParcelController>().State != ParcelState.Dropped
+            if (parcel.GetComponent<ParcelController>().State == ParcelState.Travelling
                 && parcel.transform.position.x > aboutToDropX)
             {
+                // Set state and raise game event
                 parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+                EventManager.Instance.TriggerParcelAboutToDrop(parcel);
             }
         }
     }

@@ -25,7 +25,7 @@ public class GameMenuManager : MonoBehaviour
         _gameMenuController.CloseMenu();
 
         // Get game manager to start a new game
-        _gameManager.StartNewGame();
+        _gameManager.StartNewGame(new PlayerModel() { IsHuman = true });
     }
 
     // Opens the game menu and pauses the game
@@ -49,12 +49,12 @@ public class GameMenuManager : MonoBehaviour
     }
     
     public void RestartAfterGameOverClickHandler()
-    {
-        // Reset the game
-        _gameManager.ResetGame();
-
+    {       
         // Open the game menu
         _gameMenuController.OpenMenu(_gameManager.CurrentState);
+
+        // Get game manager to start a new game
+        _gameManager.StartNewGame(new PlayerModel() { IsHuman = false });
     }
 
 	#endregion

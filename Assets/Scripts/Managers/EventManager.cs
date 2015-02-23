@@ -34,32 +34,42 @@ public class EventManager
     }
 
     // Parcel falling event
-    public event Action<GameObject, GameObject> ParcelDropped;
-    public void TriggerParcelDropped(GameObject conveyorBelt, GameObject parcel)
+    public event Action<GameObject> ParcelDropped;
+    public void TriggerParcelDropped(GameObject parcel)
     {
         if (ParcelDropped != null)
         {
-            ParcelDropped(conveyorBelt, parcel);
+            ParcelDropped(parcel);
+        }
+    }
+
+    // Parcel dropping soon event
+    public event Action<GameObject> ParcelAboutToDrop;
+    public void TriggerParcelAboutToDrop(GameObject parcel)
+    {
+        if (ParcelAboutToDrop != null)
+        {
+            ParcelAboutToDrop(parcel);
         }
     }
 
     // Parcel loaded event
-    public event Action ParcelLoaded;
-    public void TriggerParcelLoaded()
+    public event Action<GameObject> ParcelLoaded;
+    public void TriggerParcelLoaded(GameObject parcel)
     {
         if (ParcelLoaded != null)
         {
-            ParcelLoaded();
+            ParcelLoaded(parcel);
         }
     }
 
     // Parcel broken event
-    public event Action ParcelBroken;
-    public void TriggerParcelBroken()
+    public event Action<GameObject> ParcelBroken;
+    public void TriggerParcelBroken(GameObject parcel)
     {
         if (ParcelBroken != null)
         {
-            ParcelBroken();
+            ParcelBroken(parcel);
         }
     }
 
@@ -73,13 +83,23 @@ public class EventManager
         }
     }
 
-    // Game state changed event
-    public event Action<GameState, GameState> GameStateChanged;
-    public void TriggerGameStateChanged(GameState changedFrom, GameState changedTo)
+    // Game over changed event
+    public event Action GameOver;
+    public void TriggerGameOver()
     {
-        if (GameStateChanged != null)
+        if (GameOver != null)
         {
-            GameStateChanged(changedFrom, changedTo);
+            GameOver();
+        }
+    }
+
+    // Life lost changed event
+    public event Action LifeLost;
+    public void TriggerLifeLost()
+    {
+        if (LifeLost != null)
+        {
+            LifeLost();
         }
     }
 

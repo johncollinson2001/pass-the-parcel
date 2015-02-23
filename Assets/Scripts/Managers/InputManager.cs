@@ -52,12 +52,18 @@ public class InputManager : MonoBehaviour
     // Handles the game menu button click
     void HandleInputToOpenGameMenu()
     {
-        if (Input.GetMouseButtonDown(0))
+        // Check for active game being played by a human
+        if (_gameManager.CurrentState == GameState.Active && _gameManager.Player.IsHuman)
         {
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null && hit.collider.gameObject == _menuButton)
-            {                
-                _gameMenuManager.InGameMenuButtonClickHandler();
+            // Check for a mouse button click
+            if (Input.GetMouseButtonDown(0))
+            {
+                // See if the click was on the menu button
+                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                if (hit.collider != null && hit.collider.gameObject == _menuButton)
+                {
+                    _gameMenuManager.InGameMenuButtonClickHandler();
+                }
             }
         }
     }
@@ -76,8 +82,8 @@ public class InputManager : MonoBehaviour
     // Applys input (if any) to the left worker
     void HandleInputForWorkerLeft()
     {
-        // Check the worker is active
-        if (_workerLeft.GetComponent<WorkerController>().Active)
+        // Check the game is currently being played by a human and the worker is active
+        if (_gameManager.CurrentState == GameState.Active && _gameManager.Player.IsHuman && _workerLeft.GetComponent<WorkerController>().Active)
         {
             // Look for the user pressing a key and handle the worker movement
             if (Input.GetKeyDown(Controls.workerLeft_UpKey) || GamePadPressed(_gamePadLeft_Up))
@@ -94,8 +100,8 @@ public class InputManager : MonoBehaviour
     // Applys input (if any) to the right worker
     void HandleInputForWorkerRight()
     {
-        // Check the worker is active
-        if (_workerRight.GetComponent<WorkerController>().Active)
+        // Check the game is currently being played by a human and the worker is active
+        if (_gameManager.CurrentState == GameState.Active && _gameManager.Player.IsHuman && _workerRight.GetComponent<WorkerController>().Active)
         {
             // Look for the user pressing a key and handle the worker movement
             if (Input.GetKeyDown(Controls.workerRight_UpKey) || GamePadPressed(_gamePadRight_Up))
@@ -125,13 +131,18 @@ public class InputManager : MonoBehaviour
 
     bool HandleGamePadUnpressed(GameObject gamePadButton)
     {
-        if (Input.GetMouseButtonUp(0) && MouseOverGamePad(gamePadButton))
+        // Check the game is active and being played by a human
+        if (_gameManager.CurrentState == GameState.Active && _gameManager.Player.IsHuman)
         {
-            // Make the game pad button opaque
-            Color currentColor = gamePadButton.GetComponent<SpriteRenderer>().color;
-            gamePadButton.GetComponent<SpriteRenderer>().color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.5f);
+            // Check the user has lifted the mouse button and over the game pad too
+            if (Input.GetMouseButtonUp(0) && MouseOverGamePad(gamePadButton))
+            {
+                // Make the game pad button opaque
+                Color currentColor = gamePadButton.GetComponent<SpriteRenderer>().color;
+                gamePadButton.GetComponent<SpriteRenderer>().color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.5f);
 
-            return true;
+                return true;
+            }
         }
 
         return false;
