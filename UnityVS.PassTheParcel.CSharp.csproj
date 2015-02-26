@@ -80,10 +80,12 @@
     <Compile Include="Assets\Scripts\Enums\PlatformLevel.cs" />
     <Compile Include="Assets\Scripts\Enums\RotationDirection.cs" />
     <Compile Include="Assets\Scripts\Enums\ScreenSide.cs" />
+    <Compile Include="Assets\Scripts\EventFlows\LoadedParcelEventFlow.cs" />
+    <Compile Include="Assets\Scripts\EventFlows\BrokenParcelEventFlow.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\GameAI.cs" />
     <Compile Include="Assets\Scripts\Managers\EventManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\ObjectActivationManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\ObjectManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\MenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\InputManager.cs" />
@@ -97,5 +99,6 @@
   <ItemGroup>
     <None Include="Assets\Data\HighScore.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

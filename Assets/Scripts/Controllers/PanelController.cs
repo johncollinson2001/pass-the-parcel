@@ -10,8 +10,6 @@ public class PanelController : MonoBehaviour
     public Text _panelContentText;
     public Text _countdownText;
 
-    public GameManager _gameManager;
-
     #region Mono Behaviours
 
     void Awake()
@@ -38,7 +36,7 @@ public class PanelController : MonoBehaviour
     // Shows the level completed panel 
     public void ShowLostLifePanel(int countdownToGameRestart)
     {
-        ShowPanel(PanelText.lostLifeTitle, string.Format(PanelText.lostLife, _gameManager.LivesRemaining, _gameManager.LivesRemaining == 1 ? "life" : "lives"));
+        ShowPanel(PanelText.lostLifeTitle, string.Format(PanelText.lostLife, ScoreManager.Instance.LivesRemaining, ScoreManager.Instance.LivesRemaining == 1 ? "life" : "lives"));
 
         // Show the countdown
         ShowCountdown(countdownToGameRestart);

@@ -11,6 +11,9 @@ public class ScoreManager
 
     public int CurrentScore { get; private set; }
     public int HighScore { get; private set; }
+    public int LivesRemaining { get; set; }
+    public int ParcelsLoadedTotal { get; set; }
+    public int ParcelsLoadedOnCurrentTruck { get; set; }
 
     public static ScoreManager Instance
     {
@@ -42,8 +45,10 @@ public class ScoreManager
     // Resets the Score manager
     public void Reset()
     {
-        // Setup the current Score back to zero
         CurrentScore = 0;
+        LivesRemaining = Constants.Game.startingLives;
+        ParcelsLoadedTotal = 0;
+        ParcelsLoadedOnCurrentTruck = 0;
     }
 
     // Saves the high score the current score is higher

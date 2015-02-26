@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
 
-public class LevelManager 
+public class LevelManager : MonoBehaviour
 {
     private static LevelManager _instance;
+
+    public ParcelSpawner _parcelSpawner;
+    public List<GameObject> _conveyorBelts = new List<GameObject>();
 
     public LevelModel CurrentLevel { get; private set; }
 
@@ -12,24 +14,40 @@ public class LevelManager
     {
         get
         {
-            // Instantiate instance if not created
-            if(_instance == null)
+            if (_instance == null)
             {
-                _instance = new LevelManager();
+                _instance = Object.FindObjectOfType(typeof(LevelManager)) as LevelManager;
 
-                // Setup the current level as the starting level 
-                _instance.CurrentLevel = LevelGenerator.CreateStartingLevel();
-
-                // Subscribe to the debugger event
-                EventManager.Instance.DebugWrite += _instance.WriteTextToDebugger;
+                if (_instance == null)
+                {
+                    GameObject go = new GameObject("LevelManager");
+                    DontDestroyOnLoad(go);
+                    _instance = go.AddComponent<LevelManager>();
+                }
             }
-
             return _instance;
         }
     }
 
-    // Singleton constructor
-    private LevelManager() { }
+    #region Mono Behaviors
+
+    void Awake()
+    {
+        // Setup the current level as the starting level 
+        CurrentLevel = LevelGenerator.CreateStartingLevel();
+    }
+
+    void OnEnable()
+    {
+        EventManager.Instance.DebugWrite += WriteTextToDebugger;
+    }
+
+    void OnDisable()
+    {
+        EventManager.Instance.DebugWrite -= WriteTextToDebugger;
+    }
+
+    #endregion
 
     #region Public Methods
 
@@ -41,6 +59,9 @@ public class LevelManager
 
         // Set the current level as the next level we have just created
         CurrentLevel = nextLevel;
+
+        // Apply the new level settings to the game objects
+        ApplyCurrentLevelToGame();
     }
 
     // Resets the level manager
@@ -48,11 +69,30 @@ public class LevelManager
     {
         // Setup the current level as the starting level 
         _instance.CurrentLevel = LevelGenerator.CreateStartingLevel();
+
+        // Apply the new level settings to the game objects
+        ApplyCurrentLevelToGame();
     }
 
     #endregion
 
     #region Private Methods
+
+    // Apply level settings to game 
+    void ApplyCurrentLevelToGame()
+    {
+        // Apply the settings of the next level to the game objects
+        _parcelSpawner.SpawnRate = CurrentLevel.SpawnRate;
+        _parcelSpawner.MinimumSpawnsPerWave = CurrentLevel.MinimumSpawnsPerBurst;
+        _parcelSpawner.MaximumSpawnsPerWave = CurrentLevel.MaximumSpawnsPerBurst;
+        _parcelSpawner.SpawnWaveGap = CurrentLevel.SpawnBurstGap;
+        _parcelSpawner.UseSpawnRateRandomiser = CurrentLevel.UseSpawnRateRandomiser;
+
+        foreach (var conveyorBelt in _conveyorBelts)
+        {
+            conveyorBelt.GetComponent<ConveyorBeltController>()._speed = CurrentLevel.ConveyorBeltSpeed;
+        }
+    }
 
     // Writes the level debug text to the debugger
     void WriteTextToDebugger(GUIText guiText)

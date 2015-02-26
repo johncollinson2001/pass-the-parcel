@@ -4,14 +4,33 @@ using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour 
 {
-    public GameManager _gameManager;
-    public GameMenuController _gameMenuController;
+    private static MenuManager _instance;
+    public GameMenuController _menuController;
+
+    public static MenuManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = Object.FindObjectOfType(typeof(MenuManager)) as MenuManager;
+
+                if (_instance == null)
+                {
+                    GameObject go = new GameObject("MenuManager");
+                    DontDestroyOnLoad(go);
+                    _instance = go.AddComponent<MenuManager>();
+                }
+            }
+            return _instance;
+        }
+    } 
 
     #region Mono Behaviours
 
     void Awake()
     {
-        _gameMenuController.OpenMenu(_gameManager.CurrentState);
+        _menuController.OpenMenu(GameManager.Instance.CurrentState);
     }
 
     #endregion
@@ -19,42 +38,42 @@ public class MenuManager : MonoBehaviour
     #region Public Methods
 
     // Starts a new game
-    public void StartNewGameClickHandler()
+    public void StartNewGame()
     {
         // Close game menu
-        _gameMenuController.CloseMenu();
+        _menuController.CloseMenu();
 
         // Get game manager to start a new game
-        _gameManager.StartNewGame(new PlayerModel() { IsHuman = true });
+        GameManager.Instance.StartNewGame(new PlayerModel() { IsHuman = true });
     }
 
     // Opens the game menu and pauses the game
-    public void InGameMenuButtonClickHandler()
+    public void OpenMenuDuringGame()
     {
         // Pause the game 
-        _gameManager.PauseGame();
+        GameManager.Instance.PauseGame();
 
         // Open the game menu with the resume button
-        _gameMenuController.OpenMenu(_gameManager.CurrentState);
+        _menuController.OpenMenu(GameManager.Instance.CurrentState);
     }
 
     // Closes the game menu and un pauses the game
-    public void ResumeButtonClickHandler()
+    public void ResumeGame()
     {
         // Close the menu
-        _gameMenuController.CloseMenu();
+        _menuController.CloseMenu();
 
         // Unpause the game
-        _gameManager.UnpauseGame();
+        GameManager.Instance.UnpauseGame();
     }
     
-    public void RestartAfterGameOverClickHandler()
+    public void OpenMenuWhenGameOver()
     {       
         // Open the game menu
-        _gameMenuController.OpenMenu(_gameManager.CurrentState);
+        _menuController.OpenMenu(GameManager.Instance.CurrentState);
 
         // Get game manager to start a new game
-        _gameManager.StartNewGame(new PlayerModel() { IsHuman = false });
+        GameManager.Instance.StartNewGame(new PlayerModel() { IsHuman = false });
     }
 
 	#endregion

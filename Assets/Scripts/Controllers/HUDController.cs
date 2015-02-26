@@ -11,8 +11,6 @@ public class HUDController : MonoBehaviour
     public GUIText _parcelLoadedOnTruckText;
     public GUIText _scoreText;
 
-    public GameManager _gameManager;
-
 	#region Mono Behaviours
 
     void Update()
@@ -27,10 +25,10 @@ public class HUDController : MonoBehaviour
     // Updates the HUD
     void UpdateHUD()
 	{
-		_livesRemainingText.text = string.Format(HudText.livesRemaining, _gameManager.LivesRemaining);
+		_livesRemainingText.text = string.Format(HudText.livesRemaining, ScoreManager.Instance.LivesRemaining);
         _levelText.text = string.Format(HudText.level, LevelManager.Instance.CurrentLevel.LevelNumber);
         _truckCapacityText.text = string.Format(HudText.truckCapacity, LevelManager.Instance.CurrentLevel.TruckCapacity);
-        _parcelLoadedOnTruckText.text = string.Format(HudText.parcelsLoadedOnTruck, _gameManager.ParcelsLoadedOnCurrentTruck);
+        _parcelLoadedOnTruckText.text = string.Format(HudText.parcelsLoadedOnTruck, ScoreManager.Instance.ParcelsLoadedOnCurrentTruck);
         _scoreText.text = string.Format(HudText.score, ScoreManager.Instance.CurrentScore);
 	}
 
