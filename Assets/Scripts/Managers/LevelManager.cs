@@ -1,33 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class LevelManager : MonoBehaviour
+public class LevelManager : MonoSingleton<LevelManager>
 {
-    private static LevelManager _instance;
-
     public ParcelSpawner _parcelSpawner;
     public List<GameObject> _conveyorBelts = new List<GameObject>();
 
     public LevelModel CurrentLevel { get; private set; }
-
-    public static LevelManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Object.FindObjectOfType(typeof(LevelManager)) as LevelManager;
-
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("LevelManager");
-                    DontDestroyOnLoad(go);
-                    _instance = go.AddComponent<LevelManager>();
-                }
-            }
-            return _instance;
-        }
-    }
 
     #region Mono Behaviors
 
@@ -68,7 +47,7 @@ public class LevelManager : MonoBehaviour
     public void Reset()
     {
         // Setup the current level as the starting level 
-        _instance.CurrentLevel = LevelGenerator.CreateStartingLevel();
+        CurrentLevel = LevelGenerator.CreateStartingLevel();
 
         // Apply the new level settings to the game objects
         ApplyCurrentLevelToGame();

@@ -2,29 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class MenuManager : MonoBehaviour 
+public class MenuManager : MonoSingleton<MenuManager> 
 {
-    private static MenuManager _instance;
     public GameMenuController _menuController;
-
-    public static MenuManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Object.FindObjectOfType(typeof(MenuManager)) as MenuManager;
-
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("MenuManager");
-                    DontDestroyOnLoad(go);
-                    _instance = go.AddComponent<MenuManager>();
-                }
-            }
-            return _instance;
-        }
-    } 
 
     #region Mono Behaviours
 

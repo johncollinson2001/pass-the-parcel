@@ -84,6 +84,7 @@
     <Compile Include="Assets\Scripts\EventFlows\BrokenParcelEventFlow.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\GameAI.cs" />
+    <Compile Include="Assets\Scripts\Abstract\MonoSingleton.cs" />
     <Compile Include="Assets\Scripts\Managers\EventManager.cs" />
     <Compile Include="Assets\Scripts\Managers\ObjectManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />

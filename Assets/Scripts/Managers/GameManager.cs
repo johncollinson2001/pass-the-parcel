@@ -2,35 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour 
+public class GameManager : MonoSingleton<GameManager> 
 {
-    private static GameManager _instance;    
-
-    public PanelController _panelController;
-    public ParcelSpawner _parcelSpawner;
+    public PanelController _panelController;    
     public GameAI _ai;
     
     public PlayerModel Player { get; set; }
     public GameState CurrentState { get; private set; }
-
-    public static GameManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Object.FindObjectOfType(typeof(GameManager)) as GameManager;
-
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("GameManager");
-                    DontDestroyOnLoad(go);
-                    _instance = go.AddComponent<GameManager>();
-                }
-            }
-            return _instance;
-        }
-    } 
 
 	#region Mono Behaviours
 
@@ -63,11 +41,8 @@ public class GameManager : MonoBehaviour
         // Reset the game
         ResetGame();        
 
-        // Activate the game objects
-        ObjectManager.Instance.ActivateGameObjects();
-
-        // Enable the parcel spawner
-        _parcelSpawner.StartSpawning();
+        // Start the game objects
+        ObjectManager.Instance.StartGameObjects();        
 
         // Set game state
         CurrentState = GameState.Active;
@@ -77,10 +52,7 @@ public class GameManager : MonoBehaviour
     public void ResetGame()
     {
         // Reset game manager variables
-        CurrentState = GameState.Inactive;
-        
-        // Reset the parcel spawner        
-        _parcelSpawner.Reset();
+        CurrentState = GameState.Inactive;               
 
         // Reset the game objects
         ObjectManager.Instance.ResetGameObjects();
@@ -99,23 +71,17 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         // Set game state
-        CurrentState = GameState.Paused;
+        CurrentState = GameState.Paused;        
 
-        // Pause the parcel spawner
-        _parcelSpawner.PauseSpawning();
-
-        // Deactivate the game objects
-        ObjectManager.Instance.DeactivateGameObjects();
+        // Pause the game objects
+        ObjectManager.Instance.PauseGameObjects();
     }
 
     // Unpauses the game
     public void UnpauseGame()
-    {
-        // Unpause the parcel spawner
-        _parcelSpawner.UnpauseSpawning();
-
-        // Active the game objects
-        ObjectManager.Instance.ActivateGameObjects();
+    {        
+        // Unpause the game objects
+        ObjectManager.Instance.UnpauseGameObjects();
 
         // Set game state
         CurrentState = GameState.Active;
@@ -128,10 +94,7 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.GameOver;
 
         // Deactivate the game objects
-        ObjectManager.Instance.DeactivateGameObjects();
-
-        // Stop the parcel spawner
-        _parcelSpawner.StopSpawning();
+        ObjectManager.Instance.StopGameObjects();        
 
         if (Player.IsHuman)
         {

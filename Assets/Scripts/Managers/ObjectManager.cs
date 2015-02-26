@@ -2,32 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ObjectManager : MonoBehaviour 
+public class ObjectManager : MonoSingleton<ObjectManager> 
 {
-    private static ObjectManager _instance;
-
-    public GameObject _workerLeft;
-    public GameObject _workerRight;
-    public List<GameObject> _conveyorBelts = new List<GameObject>();
-
-    public static ObjectManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Object.FindObjectOfType(typeof(ObjectManager)) as ObjectManager;
-
-                if (_instance == null)
-                {
-                    GameObject go = new GameObject("ObjectManager");
-                    DontDestroyOnLoad(go);
-                    _instance = go.AddComponent<ObjectManager>();
-                }
-            }
-            return _instance;
-        }
-    }    
+    public WorkerController _workerLeft;
+    public WorkerController _workerRight;
+    public List<ConveyorBeltController> _conveyorBelts;
+    public ParcelSpawner _parcelSpawner;
 
     #region Public Methods
 
@@ -37,7 +17,7 @@ public class ObjectManager : MonoBehaviour
         // Clear all parcels from the conveyors
         foreach (var conveyor in _conveyorBelts)
         {
-            conveyor.GetComponent<ConveyorBeltController>().ClearParcels();
+            conveyor.ClearParcels();
         }
 
         // Destroy any other parcels in the scene (i.e. dropped parcels)
@@ -47,55 +27,104 @@ public class ObjectManager : MonoBehaviour
         }
 
         // Reset the workers
-        _workerLeft.GetComponent<WorkerController>().Reset();
-        _workerRight.GetComponent<WorkerController>().Reset();
+        _workerLeft.Reset();
+        _workerRight.Reset();
+
+        // Reset the parcel spawner        
+        _parcelSpawner.Reset();
     }
 
-    // Activates the game objects
-    public void ActivateGameObjects()
+    public void PauseGameObjects()
+    {
+        // Pause the parcel spawner
+        _parcelSpawner.PauseSpawning();
+
+        DeactivateConveyorBelts();
+        DeactivateWorkers();
+    }
+
+    public void UnpauseGameObjects()
+    {
+        // Unpause the parcel spawner
+        _parcelSpawner.UnpauseSpawning();
+
+        ActivateConveyorBelts();
+        ActivateWorkers();
+    }
+
+    public void StartGameObjects()
+    {
+        // Enable the parcel spawner
+        _parcelSpawner.StartSpawning();
+
+        ActivateConveyorBelts();
+        ActivateWorkers();
+    }
+
+    public void StopGameObjects()
+    {
+        // Stop the parcel spawner
+        _parcelSpawner.StopSpawning();
+
+        DeactivateConveyorBelts();
+        DeactivateWorkers();
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    void ActivateConveyorBelts()
     {
         // Enable the conveyor belts
         foreach (var conveyorBelt in _conveyorBelts)
         {
-            conveyorBelt.GetComponent<ConveyorBeltController>().StartConveyorBelt();
+            conveyorBelt.StartConveyorBelt();
         }
 
         // Unfreeze all dropped parcels
         foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
         {
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
+            ParcelController parcelController = parcel.GetComponent<ParcelController>();
+            if (parcelController.State == ParcelState.Dropped)
             {
                 // Oh dear the players about to loose another life!
-                parcel.GetComponent<ParcelController>().Unfreeze();
+                parcelController.Unfreeze();
             }
         }
-
-        // Enable the workers
-        _workerLeft.GetComponent<WorkerController>().Active = true;
-        _workerRight.GetComponent<WorkerController>().Active = true;        
     }
 
-    // Deactivates the game objects
-    public void DeactivateGameObjects()
+    void ActivateWorkers()
+    {
+        // Enable the workers
+        _workerLeft.Active = true;
+        _workerRight.Active = true;
+    }
+
+    void DeactivateConveyorBelts()
     {
         // Disable the conveyor belts
         foreach (var conveyorBelt in _conveyorBelts)
         {
-            conveyorBelt.GetComponent<ConveyorBeltController>().StopConveyorBelt();
+            conveyorBelt.StopConveyorBelt();
         }
 
         // Freeze all dropped parcels
         foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
         {
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
+            ParcelController parcelController = parcel.GetComponent<ParcelController>();
+            if (parcelController.State == ParcelState.Dropped)
             {
-                parcel.GetComponent<ParcelController>().Freeze();
+                parcelController.Freeze();
             }
         }
+    }
 
+    void DeactivateWorkers()
+    {
         // Disable the workers
-        _workerLeft.GetComponent<WorkerController>().Active = false;
-        _workerRight.GetComponent<WorkerController>().Active = false;        
+        _workerLeft.Active = false;
+        _workerRight.Active = false;        
     }
     
 	#endregion
