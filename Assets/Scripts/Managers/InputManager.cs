@@ -4,7 +4,7 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     public GameManager _gameManager;
-    public GameMenuManager _gameMenuManager; 
+    public MenuManager _gameMenuManager; 
     public GameObject _workerLeft;
     public GameObject _workerRight;
     public GameObject _menuButton;

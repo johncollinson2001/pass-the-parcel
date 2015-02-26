@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
+    private static ObjectActivationManager _instance;
     private GameState _currentState = GameState.Inactive;
 
     public PanelController _panelController;
     public ParcelSpawner _parcelSpawner;
-    public AIManager _ai;
+    public GameAI _ai;
     public GameObject _workerLeft;
     public GameObject _workerRight;
     public GameObject _truck;
@@ -28,6 +29,25 @@ public class GameManager : MonoBehaviour
             
         }
     }
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = Object.FindObjectOfType(typeof(GameManager)) as GameManager;
+
+                if (_instance == null)
+                {
+                    GameObject go = new GameObject("GameManager");
+                    DontDestroyOnLoad(go);
+                    _instance = go.AddComponent<GameManager>();
+                }
+            }
+            return _instance;
+        }
+    } 
 
 	#region Mono Behaviours
 
@@ -72,8 +92,8 @@ public class GameManager : MonoBehaviour
         // Reset the game
         ResetGame();        
 
-        // Start the game
-        ActivateGameObjects();
+        // Activate the game objects
+        ObjectActivationManager.Instance.ActivateGameObjects();
 
         // Enable the parcel spawner
         _parcelSpawner.StartSpawning();
@@ -133,7 +153,7 @@ public class GameManager : MonoBehaviour
         _parcelSpawner.PauseSpawning();
 
         // Deactivate the game objects
-        DeactivateGameObjects();
+        ObjectActivationManager.Instance.DeactivateGameObjects();
     }
 
     // Unpauses the game
@@ -143,7 +163,7 @@ public class GameManager : MonoBehaviour
         _parcelSpawner.UnpauseSpawning();
 
         // Active the game objects
-        ActivateGameObjects();
+        ObjectActivationManager.Instance.ActivateGameObjects();
 
         // Set game state
         CurrentState = GameState.Active;
@@ -325,11 +345,11 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.GameOver;
 
         // Deactivate the game objects
-        DeactivateGameObjects();
+        ObjectActivationManager.Instance.DeactivateGameObjects();
 
         // Stop the parcel spawner
         _parcelSpawner.StopSpawning();
-
+        
         if (Player.IsHuman)
         {
             // Set the high score
@@ -340,59 +360,28 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // Just start a new game is the player is not human
-            StartNewGame(new PlayerModel() { IsHuman = false });
+            // Deactive the AI
+            _ai.Deactivate();
+
+            // Restart the game
+            StartCoroutine(CountdownToRestartGameForAI());
         }
 
         // Trigger game over event
         EventManager.Instance.TriggerGameOver();
-    }    
-
-    // Activates the game objects
-    void ActivateGameObjects()
-    {
-        // Enable the conveyor belts
-        foreach (var conveyorBelt in _conveyorBelts)
-        {
-            conveyorBelt.GetComponent<ConveyorBeltController>().StartConveyorBelt();
-        }
-
-        // Unfreeze all dropped parcels
-        foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
-        {
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
-            {
-                // Oh dear the players about to loose another life!
-                parcel.GetComponent<ParcelController>().Unfreeze();
-            }
-        }
-
-        // Enable the workers
-        _workerLeft.GetComponent<WorkerController>().Active = true;
-        _workerRight.GetComponent<WorkerController>().Active = true;        
     }
 
-    // Deactivates the game objects
-    void DeactivateGameObjects()
+    // Counts down to the game restart used in a coroutine
+    IEnumerator CountdownToRestartGameForAI()
     {
-        // Disable the conveyor belts
-        foreach (var conveyorBelt in _conveyorBelts)
+        // Iterate through the pause length to hold the game
+        for (float timer = Constants.Game.aiGameRestartLength; timer >= 0; timer -= Time.deltaTime)
         {
-            conveyorBelt.GetComponent<ConveyorBeltController>().StopConveyorBelt();
+            yield return 0;
         }
 
-        // Freeze all dropped parcels
-        foreach (var parcel in GameObject.FindGameObjectsWithTag(Tags.parcel))
-        {
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Dropped)
-            {
-                parcel.GetComponent<ParcelController>().Freeze();
-            }
-        }
-
-        // Disable the workers
-        _workerLeft.GetComponent<WorkerController>().Active = false;
-        _workerRight.GetComponent<WorkerController>().Active = false;        
+        // Restart the game
+        StartNewGame(new PlayerModel() { IsHuman = false });
     }
     
 	#endregion

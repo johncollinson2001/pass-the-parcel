@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameMenuManager : MonoBehaviour 
+public class MenuManager : MonoBehaviour 
 {
     public GameManager _gameManager;
     public GameMenuController _gameMenuController;

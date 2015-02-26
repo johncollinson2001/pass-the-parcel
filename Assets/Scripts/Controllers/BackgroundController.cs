@@ -13,16 +13,24 @@ public class BackgroundController : MonoBehaviour
     void OnEnable()
     {
         EventManager.Instance.LevelUp += CheckIfBackgroundShouldBeChanged;
+        EventManager.Instance.GameOver += Reset;
     }
 
     void OnDisable()
     {
-        EventManager.Instance.LevelUp += CheckIfBackgroundShouldBeChanged;
+        EventManager.Instance.LevelUp -= CheckIfBackgroundShouldBeChanged;
+        EventManager.Instance.GameOver -= Reset;
     }
 
     #endregion
 
     #region Private Methods
+
+    void Reset()
+    {
+        _backgroundIndex = 0;
+        GetComponent<SpriteRenderer>().sprite = _backgroundSprites[_backgroundIndex];
+    }
 
     // Checks if the background should be changed and changes it
     void CheckIfBackgroundShouldBeChanged(LevelModel nextLevel)

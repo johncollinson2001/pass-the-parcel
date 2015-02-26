@@ -7,7 +7,7 @@ using UnityEngine;
 /// until it is totally robust. It plays the game for quite a while though but gets a bit confused when the 
 /// conveyors get really fast!
 /// </summary>
-public class AIManager : MonoBehaviour
+public class GameAI : MonoBehaviour
 {
     private bool _active;
     private HashSet<GameObject> _parcelsInQueue = new HashSet<GameObject>();
@@ -18,7 +18,7 @@ public class AIManager : MonoBehaviour
 
     #region Mono Behaviours
 
-    void FixedUpdate()
+    void Update()
     {
         // Play the game if the player is not human
         if(_active)
