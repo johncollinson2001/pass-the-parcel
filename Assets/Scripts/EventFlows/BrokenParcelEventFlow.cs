@@ -24,9 +24,8 @@ public class BrokenParcelEventFlow : MonoBehaviour
 
     // Handles the event of a worker dropping a parcel
 	void HandleBrokenParcel(GameObject parcel)
-	{
-        // Ensure the game has not already ended
-        if (GameManager.Instance.CurrentState == GameState.Active)
+	{             
+        if (GameManager.Instance.Player.IsHuman)
         {
             // Decrement worker life counter
             ScoreManager.Instance.LivesRemaining -= 1;
@@ -42,6 +41,11 @@ public class BrokenParcelEventFlow : MonoBehaviour
                 // Handle the loss of a worker life
                 TakeLife();
             }
+        }
+        else
+        {
+            // If the current player is not human just end the game here
+            GameManager.Instance.EndGame();
         }
 	}
 

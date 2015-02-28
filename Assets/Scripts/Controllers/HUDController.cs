@@ -15,7 +15,10 @@ public class HUDController : MonoBehaviour
 
     void Update()
     {
-        UpdateHUD();
+        if (GameManager.Instance.Player.IsHuman)
+        {
+            UpdateHUD();
+        }
     }
 
 	#endregion	

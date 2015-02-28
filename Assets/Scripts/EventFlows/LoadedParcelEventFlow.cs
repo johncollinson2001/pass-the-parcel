@@ -34,10 +34,7 @@ public class LoadedParcelEventFlow : MonoBehaviour
 
         // See if the truck is full
         if (ScoreManager.Instance.ParcelsLoadedOnCurrentTruck == LevelManager.Instance.CurrentLevel.TruckCapacity)
-        {
-            // Tell the truck to deliver some parcels
-            _truck.DeliverParcels();
-
+        {                
             // Player has reached the next level
             MoveToNextLevel();
         }
@@ -55,12 +52,20 @@ public class LoadedParcelEventFlow : MonoBehaviour
 
         if (GameManager.Instance.Player.IsHuman)
         {
+            // Tell the truck to deliver some parcels
+            _truck.DeliverParcels();
+
             // Get the panel to display 
             _panelController.ShowLevelCompletedPanel(Constants.Game.levelUpPauseLength);
-        }
 
-        // Kick off a coroutine to pause until the next level starts
-        StartCoroutine(CountdownToNextLevel());
+            // Kick off a coroutine to pause until the next level starts
+            StartCoroutine(CountdownToNextLevel());
+        }
+        else
+        {
+            // Start the next level immediately for the ai player
+            StartNextLevel();
+        }
     }
 
     // Counts down to the next level used in a coroutine
