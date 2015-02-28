@@ -5,10 +5,16 @@ using System.Collections.Generic;
 public class BackgroundController : MonoBehaviour
 {
     private int _backgroundIndex = 0;
+    private SpriteRenderer _spriteRenderer;
 
     public Sprite[] _backgroundSprites;
 
     #region Mono Behaviours
+
+    void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     void OnEnable()
     {
@@ -29,7 +35,7 @@ public class BackgroundController : MonoBehaviour
     void Reset()
     {
         _backgroundIndex = 0;
-        GetComponent<SpriteRenderer>().sprite = _backgroundSprites[_backgroundIndex];
+        _spriteRenderer.sprite = _backgroundSprites[_backgroundIndex];
     }
 
     // Checks if the background should be changed and changes it
@@ -48,7 +54,7 @@ public class BackgroundController : MonoBehaviour
         Sprite nextBackgroundSprite = GetNextBackgroundSprite();
 
         // Change the background of the sprite
-        GetComponent<SpriteRenderer>().sprite = nextBackgroundSprite;
+        _spriteRenderer.sprite = nextBackgroundSprite;
     }
 
     // Gets the next background path on a sequence

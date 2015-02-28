@@ -6,7 +6,7 @@ public class ConveyorBeltController : MonoBehaviour
 {
     private const float BASE_PARCEL_MOVEMENT = 0.01f;
 
-    private List<GameObject> _cogs = new List<GameObject>();
+    private List<RotationController> _cogRotators = new List<RotationController>();
     private List<GameObject> _parcels = new List<GameObject>();
 
     public ScreenSide _travellingTo;
@@ -25,7 +25,7 @@ public class ConveyorBeltController : MonoBehaviour
             // If this child is a cog, add it to the member variable
             if(child.tag == Tags.conveyorCog)
             {
-                _cogs.Add(child.gameObject);
+                _cogRotators.Add(child.gameObject.GetComponent<RotationController>());
             }
         }      
 	}
@@ -75,11 +75,8 @@ public class ConveyorBeltController : MonoBehaviour
     public void StartConveyorBelt()
     {
         // Iterate over the cogs
-        foreach(GameObject cog in _cogs)
+        foreach (RotationController cogRotator in _cogRotators)
         {
-            // Get the cogs rotator
-			RotationController cogRotator = cog.GetComponent<RotationController>();
-
             // Work out which way we want the cog to rotate
             if(_travellingTo == ScreenSide.Left)
             {
@@ -99,11 +96,8 @@ public class ConveyorBeltController : MonoBehaviour
     public void StopConveyorBelt()
     {
         // Iterate over the cogs
-        foreach (GameObject cog in _cogs)
+        foreach (RotationController cogRotator in _cogRotators)
         {
-            // Get the cogs rotator
-			RotationController cogRotator = cog.GetComponent<RotationController>();
-
             // Stop the rotation
             cogRotator.StopRotation();
         }
@@ -131,8 +125,8 @@ public class ConveyorBeltController : MonoBehaviour
         {
             // See if the platforms receive from conveyor is this conveyor belt
             // and if the platform has a worker standing on it
-            if (platform.GetComponent<PlatformController>()._receiveFromConveyor == gameObject
-                && platform.GetComponent<PlatformController>().HasWorker)
+            var platformController = platform.GetComponent<PlatformController>();
+            if (platformController._receiveFromConveyor == gameObject && platformController.HasWorker)
             {
                 return true;
             }
@@ -169,6 +163,7 @@ public class ConveyorBeltController : MonoBehaviour
         float conveyorPositionX = transform.position.x;
         float conveyorWidth = collider2D.bounds.size.x; // Work to the collider incase of offset
         float parcelWidth = parcel.renderer.bounds.size.x;
+        ParcelController parcelController = parcel.GetComponent<ParcelController>();
 
         // The calculations will be different depending on which way the conveyor is travelling
         if (_travellingTo == ScreenSide.Left)
@@ -179,11 +174,11 @@ public class ConveyorBeltController : MonoBehaviour
                 + (parcelWidth / 2)
                 + Constants.ConveyorBelt.aboutToDropParcelBuffer;
 
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Travelling
+            if (parcelController.State == ParcelState.Travelling
                 && parcel.transform.position.x < aboutToDropX)
             {
                 // Set state and raise game event
-                parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+                parcelController.State = ParcelState.AboutToDrop;
                 EventManager.Instance.TriggerParcelAboutToDrop(parcel);
             }
         }
@@ -195,11 +190,11 @@ public class ConveyorBeltController : MonoBehaviour
                 - (parcelWidth / 2)
                 - Constants.ConveyorBelt.aboutToDropParcelBuffer;
 
-            if (parcel.GetComponent<ParcelController>().State == ParcelState.Travelling
+            if (parcelController.State == ParcelState.Travelling
                 && parcel.transform.position.x > aboutToDropX)
             {
                 // Set state and raise game event
-                parcel.GetComponent<ParcelController>().State = ParcelState.AboutToDrop;
+                parcelController.State = ParcelState.AboutToDrop;
                 EventManager.Instance.TriggerParcelAboutToDrop(parcel);
             }
         }

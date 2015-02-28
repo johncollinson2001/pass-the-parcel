@@ -7,7 +7,8 @@ using System.Xml;
 
 public class ScoreManager 
 {
-    private static ScoreManager _instance;
+    private static ScoreManager _instance = new ScoreManager();
+    public static ScoreManager Instance { get { return _instance; } }
 
     public int CurrentScore { get; private set; }
     public int HighScore { get; private set; }
@@ -15,30 +16,17 @@ public class ScoreManager
     public int ParcelsLoadedTotal { get; set; }
     public int ParcelsLoadedOnCurrentTruck { get; set; }
 
-    public static ScoreManager Instance
-    {
-        get
-        {
-            // Instantiate instance if not created
-            if(_instance == null)
-            {
-                _instance = new ScoreManager();
-
-                // Get the current high score
-                _instance.HighScore = _instance.GetSavedHighScore();
-
-                // Register events
-                EventManager.Instance.ParcelPassed += _instance.RegisterScoreForParcelPassed;
-                EventManager.Instance.ParcelLoaded += _instance.RegisterScoreForParcelLoaded;
-                EventManager.Instance.LevelUp += _instance.RegisterScoreForLevelUp;
-            }
-
-            return _instance;
-        }
-    }
-
     // Singleton constructor
-    private ScoreManager() { }
+    private ScoreManager() 
+    {
+        // Get the current high score
+        HighScore = GetSavedHighScore();
+
+        // Register events
+        EventManager.Instance.ParcelPassed += RegisterScoreForParcelPassed;
+        EventManager.Instance.ParcelLoaded += RegisterScoreForParcelLoaded;
+        EventManager.Instance.LevelUp += RegisterScoreForLevelUp;
+    }
 
     #region Private Methods    
 

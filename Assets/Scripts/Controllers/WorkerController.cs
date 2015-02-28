@@ -6,11 +6,11 @@ public class WorkerController : MonoBehaviour
 {
     private Animator _animator;
 
-    public GameObject _startingPlatform;
+    public PlatformController _startingPlatform;
     public ScreenSide _playingSide;
     public ScreenSide _facing;
 
-    public GameObject CurrentPlatform { get; set; }
+    public PlatformController CurrentPlatform { get; set; }
     public int ParcelsLoaded { get; set; }
     public bool Active { get; set; }
     public bool Jumping { get; set; }
@@ -56,7 +56,7 @@ public class WorkerController : MonoBehaviour
     {
         Jumping = true;
 
-        switch (CurrentPlatform.GetComponent<PlatformController>()._platformLevel)
+        switch (CurrentPlatform._platformLevel)
         {
             case PlatformLevel.Bottom:
                 MoveWorker(PlatformLevel.Middle);
@@ -75,7 +75,7 @@ public class WorkerController : MonoBehaviour
     {
         Jumping = true;
 
-        switch (CurrentPlatform.GetComponent<PlatformController>()._platformLevel)
+        switch (CurrentPlatform._platformLevel)
         {
             case PlatformLevel.Top:
                 MoveWorker(PlatformLevel.Middle);
@@ -99,7 +99,7 @@ public class WorkerController : MonoBehaviour
         CurrentPlatform = _startingPlatform;
 
         // Move the work to the current platform
-        MoveWorker(CurrentPlatform.GetComponent<PlatformController>()._platformLevel);
+        MoveWorker(CurrentPlatform._platformLevel);
     }
 
     // Makes the worker take a break
@@ -123,12 +123,12 @@ public class WorkerController : MonoBehaviour
     {
         // Check if we need to turn the worker round to face the receiving from platform
         if (_facing == ScreenSide.Left
-            && CurrentPlatform.GetComponent<PlatformController>()._receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Left)
+            && CurrentPlatform._receiveFromConveyor._travellingTo == ScreenSide.Left)
         {
             TurnWorker();
         }
         else if (_facing == ScreenSide.Right
-            && CurrentPlatform.GetComponent<PlatformController>()._receiveFromConveyor.GetComponent<ConveyorBeltController>()._travellingTo == ScreenSide.Right)
+            && CurrentPlatform._receiveFromConveyor._travellingTo == ScreenSide.Right)
         {
             TurnWorker();
         }
@@ -186,21 +186,15 @@ public class WorkerController : MonoBehaviour
     // Passes the parecel along the conveyor belts
     void PassTheParcel(GameObject parcel)
 	{
-		// Get the conveyor belt that can be received from for the platform the worker is standing on
-		GameObject receiveFromConveyor = CurrentPlatform.GetComponent<PlatformController>()._receiveFromConveyor;            
-
 		// If the conveyor belt that the parcel is falling from is the conveyor belt
 		// that can be received from
-		if (parcel.GetComponent<ParcelController>().ConveyorBelt == receiveFromConveyor)
-		{                
-            // Get the conveyor belt that can be passed to from the platform the worker is standing on
-            GameObject passToConveyor = CurrentPlatform.GetComponent<PlatformController>()._passToConveyor;
-
+        if (parcel.GetComponent<ParcelController>().ConveyorBelt == CurrentPlatform._receiveFromConveyor)
+		{                            
             // Turn the worker so it looks like they pass the parcel from one side to the other
             // if the current platform loads the truck (bit of a hack here - as we assume that loading the truck needs a turn)
             // the worker is facing in the opposite direction to the conveyor they must pass to
-            if (CurrentPlatform.GetComponent<PlatformController>()._loadsTruck
-                || _facing != passToConveyor.GetComponent<ConveyorBeltController>()._travellingTo)
+            if (CurrentPlatform._loadsTruck
+                || _facing != CurrentPlatform._passToConveyor._travellingTo)
             {
                 TurnWorker();
                 // Turn the worker back to the way they were originally facing
@@ -208,7 +202,7 @@ public class WorkerController : MonoBehaviour
             }               
 
 			// If the worker is on the platform that loads the truck
-			if (CurrentPlatform.GetComponent<PlatformController>()._loadsTruck)
+			if (CurrentPlatform._loadsTruck)
 			{
 				LoadParcelOntoTruck(parcel);
 			}
@@ -220,7 +214,7 @@ public class WorkerController : MonoBehaviour
 	}
 
     // Turns the worker after a specified number of seconds delay
-    IEnumerator TurnWorkerAfterPassingParcel(float seconds, GameObject currentPlatformWhenTurned)
+    IEnumerator TurnWorkerAfterPassingParcel(float seconds, PlatformController currentPlatformWhenTurned)
     {
         yield return new WaitForSeconds(seconds);
 
@@ -264,8 +258,7 @@ public class WorkerController : MonoBehaviour
     {
         // Get the conveyor belt that can be passed to for the platform the worker is 
         // standing on
-        GameObject passToConveyor =
-            CurrentPlatform.GetComponent<PlatformController>()._passToConveyor;
+        GameObject passToConveyor = CurrentPlatform._passToConveyor.gameObject;
 
         // Pass the parcel onto the pass to conveyor
         // ... work out a bunch of values to help us work out where to put the parcel
@@ -309,8 +302,7 @@ public class WorkerController : MonoBehaviour
         foreach (PlatformController platform in GameObject.FindObjectsOfType<PlatformController>())
         {
             // Find the middle platform which is on the workers screen side
-            if (platform._screenSide == _playingSide
-                && platform._platformLevel == moveToLevel)
+            if (platform._screenSide == _playingSide && platform._platformLevel == moveToLevel)
             {
                 destinationPlatform = platform.gameObject;
 				break;
@@ -343,7 +335,7 @@ public class WorkerController : MonoBehaviour
         transform.position = new Vector3 (destinationX, destinationY);
 
         // Set the current platform
-		CurrentPlatform = destinationPlatform;
+		CurrentPlatform = destinationPlatform.GetComponent<PlatformController>();
     }
 
     #endregion

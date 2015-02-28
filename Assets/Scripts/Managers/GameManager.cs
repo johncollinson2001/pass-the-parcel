@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class GameManager : MonoSingleton<GameManager> 
 {
     public PanelController _panelController;    
-    public GameAI _ai;
     
     public PlayerModel Player { get; set; }
     public GameState CurrentState { get; private set; }
@@ -31,11 +30,11 @@ public class GameManager : MonoSingleton<GameManager>
         // Set the AI going if the player is not human
         if(!player.IsHuman)
         {
-            _ai.Activate();
+            GameAI.Instance.Activate();
         }
         else
         {
-            _ai.Deactivate();
+            GameAI.Instance.Deactivate();
         }
 
         // Reset the game
@@ -107,7 +106,7 @@ public class GameManager : MonoSingleton<GameManager>
         else
         {
             // Deactive the AI
-            _ai.Deactivate();
+            GameAI.Instance.Deactivate();
 
             // Restart the game
             StartCoroutine(CountdownToRestartGameForAI());

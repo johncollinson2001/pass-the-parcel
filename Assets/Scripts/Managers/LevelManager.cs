@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class LevelManager : MonoSingleton<LevelManager>
 {
     public ParcelSpawner _parcelSpawner;
-    public List<GameObject> _conveyorBelts = new List<GameObject>();
+    public List<ConveyorBeltController> _conveyorBelts = new List<ConveyorBeltController>();
 
     public LevelModel CurrentLevel { get; private set; }
 
@@ -69,7 +69,7 @@ public class LevelManager : MonoSingleton<LevelManager>
 
         foreach (var conveyorBelt in _conveyorBelts)
         {
-            conveyorBelt.GetComponent<ConveyorBeltController>()._speed = CurrentLevel.ConveyorBeltSpeed;
+            conveyorBelt._speed = CurrentLevel.ConveyorBeltSpeed;
         }
     }
 

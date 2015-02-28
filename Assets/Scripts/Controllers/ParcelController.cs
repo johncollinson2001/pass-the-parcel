@@ -9,8 +9,9 @@ public class ParcelController : MonoBehaviour
 	private int _platformLayer;
 	private int _workerLayer;
 	private int _parcelLayer;
+    private SpriteRenderer _spriteRenderer;
 
-    public GameObject ConveyorBelt { get; set; }
+    public ConveyorBeltController ConveyorBelt { get; set; }
     public ParcelState State { get; set; }
 
 	#region Mono Behaviours
@@ -18,7 +19,8 @@ public class ParcelController : MonoBehaviour
 	void Awake() 
 	{
         _flashing = false;
-        _originalColor = GetComponent<SpriteRenderer>().color;
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _originalColor = _spriteRenderer.color;
 
         _platformLayer = LayerMask.NameToLayer(Layers.platform);
 		_workerLayer = LayerMask.NameToLayer (Layers.worker);
@@ -35,13 +37,13 @@ public class ParcelController : MonoBehaviour
         Physics2D.IgnoreLayerCollision(_parcelLayer, _parcelLayer);
 
         // Handle flashing sequences
-        //
+        //        
         // Stop flashing if...
         if (_flashing // the parcel is currently flashing...
             && ( // and...
                 State != ParcelState.AboutToDrop // the parcel is not about to drop...
-                || !ConveyorBelt.GetComponent<ConveyorBeltController>().Operational // or the conveyor belt is not operational...
-                || ConveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // or there is a worker waiting to receive the parcel
+                || !ConveyorBelt.Operational // or the conveyor belt is not operational...
+                || ConveyorBelt.IsWorkerWaitingToReceiveParcel() // or there is a worker waiting to receive the parcel
             ))
         {
             StopFlashing();
@@ -49,8 +51,8 @@ public class ParcelController : MonoBehaviour
         // Start flashing if...
         else if (!_flashing // The parcel is not already flashing...
             && State == ParcelState.AboutToDrop // and the parcel is about to drop...
-            && ConveyorBelt.GetComponent<ConveyorBeltController>().Operational // and the conveyor belt is operational...
-            && !ConveyorBelt.GetComponent<ConveyorBeltController>().IsWorkerWaitingToReceiveParcel() // and there's no work waiting to receive the parcel
+            && ConveyorBelt.Operational // and the conveyor belt is operational...
+            && !ConveyorBelt.IsWorkerWaitingToReceiveParcel() // and there's no work waiting to receive the parcel
         )
         {
             StartFlashing();
@@ -71,7 +73,7 @@ public class ParcelController : MonoBehaviour
         // Keep a record of the conveyor belt the parcel is travelling on
         if (collision.gameObject.tag == Tags.conveyorBelt)
         {
-            ConveyorBelt = collision.gameObject;
+            ConveyorBelt = collision.gameObject.GetComponent<ConveyorBeltController>();
         }
 	}
 
@@ -115,11 +117,11 @@ public class ParcelController : MonoBehaviour
             // Manage the flash on/off
             if (!_isHighlighted)
             {
-                GetComponent<SpriteRenderer>().color = Constants.Parcel.flashHighlightColor;
+                _spriteRenderer.color = Constants.Parcel.flashHighlightColor;
             }
             else
             {
-                GetComponent<SpriteRenderer>().color = _originalColor;
+                _spriteRenderer.color = _originalColor;
             }
             
             // Reverse the highlighted flag
@@ -149,7 +151,7 @@ public class ParcelController : MonoBehaviour
     {
         if (_isHighlighted)
         {
-            GetComponent<SpriteRenderer>().color = _originalColor;
+            _spriteRenderer.color = _originalColor;
             _isHighlighted = false;
         }
     }

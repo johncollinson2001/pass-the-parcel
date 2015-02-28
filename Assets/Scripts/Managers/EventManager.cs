@@ -4,21 +4,8 @@ using System.Collections.Generic;
 
 public class EventManager 
 {
-    private static EventManager _instance;
-
-    public static EventManager Instance
-    {
-        get
-        {
-            // Instantiate instance if not created
-            if(_instance == null)
-            {
-                _instance = new EventManager();                
-            }
-
-            return _instance;
-        }
-    }
+    private static EventManager _instance = new EventManager();
+    public static EventManager Instance { get { return _instance; } }
 
     // Singleton constructor
     private EventManager() { }

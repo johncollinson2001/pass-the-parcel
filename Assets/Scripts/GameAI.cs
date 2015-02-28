@@ -7,14 +7,14 @@ using UnityEngine;
 /// until it is totally robust. It plays the game for quite a while though but gets a bit confused when the 
 /// conveyors get really fast!
 /// </summary>
-public class GameAI : MonoBehaviour
+public class GameAI : MonoSingleton<GameAI>
 {
     private bool _active;
-    private HashSet<GameObject> _parcelsInQueue = new HashSet<GameObject>();
-    private Queue<GameObject> _parcelsToPass = new Queue<GameObject>();
+    private HashSet<ParcelController> _parcelsInQueue = new HashSet<ParcelController>();
+    private Queue<ParcelController> _parcelsToPass = new Queue<ParcelController>();
 
-    public GameObject _workerLeft;
-    public GameObject _workerRight;
+    public WorkerController _workerLeft;
+    public WorkerController _workerRight;
 
     #region Mono Behaviours
 
@@ -65,9 +65,10 @@ public class GameAI : MonoBehaviour
     {
         // Add parcel to hashset of those already in the queue
         // This statement will return false if the parcel has already been queued
-        if (_parcelsInQueue.Add(parcel))
+        ParcelController parcelController = parcel.GetComponent<ParcelController>();
+        if (_parcelsInQueue.Add(parcelController))
         {
-            _parcelsToPass.Enqueue(parcel);
+            _parcelsToPass.Enqueue(parcelController);
         }
     }
 
@@ -77,10 +78,11 @@ public class GameAI : MonoBehaviour
         // Get rid of the freaking parcel
         try
         {
-            if (_parcelsToPass.Count > 0 && _parcelsToPass.Peek() == parcel)
+            ParcelController parcelController = parcel.GetComponent<ParcelController>();
+            if (_parcelsToPass.Count > 0 && _parcelsToPass.Peek() == parcelController)
             {
                 _parcelsToPass.Dequeue();
-                _parcelsInQueue.Remove(parcel);
+                _parcelsInQueue.Remove(parcelController);
             }
         }
         catch (Exception ex)
@@ -96,11 +98,10 @@ public class GameAI : MonoBehaviour
         {
             bool handledWorkerLeft = false;
             bool handledWorkerRight = false;
-            foreach(GameObject parcel in _parcelsToPass)
+            foreach(ParcelController parcel in _parcelsToPass)
             {
                 // Pull out the platform that a worker needs to be standing on to collect this parcel
-                ParcelController parcelController = parcel.GetComponent<ParcelController>();
-                PlatformController receivingPlatformController = GetReceivingPlatformForConveyor(parcelController.ConveyorBelt).GetComponent<PlatformController>();
+                PlatformController receivingPlatformController = GetReceivingPlatformForConveyor(parcel.ConveyorBelt);
                     
                 // Work out which worker needs to move
                 if (receivingPlatformController._screenSide == ScreenSide.Left && !handledWorkerLeft)
@@ -138,17 +139,16 @@ public class GameAI : MonoBehaviour
     void MoveWorkerLeft(PlatformLevel levelToMoveTo)
     {
         // Check the worker is not already jumping
-        WorkerController worker = _workerLeft.GetComponent<WorkerController>();
-        if (!worker.Jumping)
+        if (!_workerLeft.Jumping)
         {
             // See if we're moving the worker up or down
-            if (_workerLeft.GetComponent<WorkerController>().CurrentPlatform.GetComponent<PlatformController>()._platformLevel < levelToMoveTo)
+            if (_workerLeft.CurrentPlatform._platformLevel < levelToMoveTo)
             {
-                _workerLeft.GetComponent<WorkerController>().MoveWorkerUp();
+                _workerLeft.MoveWorkerUp();
             }
             else
             {
-                _workerLeft.GetComponent<WorkerController>().MoveWorkerDown();
+                _workerLeft.MoveWorkerDown();
             }
         }
     }
@@ -156,32 +156,31 @@ public class GameAI : MonoBehaviour
     void MoveWorkerRight(PlatformLevel levelToMoveTo)
     {
         // Check the worker is not already jumping
-        WorkerController worker = _workerRight.GetComponent<WorkerController>();
-        if (!worker.Jumping)
+        if (!_workerRight.Jumping)
         {
             // See if we're moving the worker up or down
-            if (_workerRight.GetComponent<WorkerController>().CurrentPlatform.GetComponent<PlatformController>()._platformLevel < levelToMoveTo)
+            if (_workerRight.CurrentPlatform._platformLevel < levelToMoveTo)
             {
-                _workerRight.GetComponent<WorkerController>().MoveWorkerUp();
+                _workerRight.MoveWorkerUp();
             }
             else
             {
-                _workerRight.GetComponent<WorkerController>().MoveWorkerDown();
+                _workerRight.MoveWorkerDown();
             }
         }
     }
 
     // Ronseal Method. Does as it says on the tin.
-    GameObject GetReceivingPlatformForConveyor(GameObject conveyorBelt)
+    PlatformController GetReceivingPlatformForConveyor(ConveyorBeltController conveyorBelt)
     {
         // Iterate over all platforms
         foreach (GameObject platform in GameObject.FindGameObjectsWithTag(Tags.workerPlatform))
         {
             // Test to see if the conveyor the platform receives from is the conveyor of the parcel
-            GameObject receiveFromConveyorForPlatfrom = platform.GetComponent<PlatformController>()._receiveFromConveyor;
-            if (receiveFromConveyorForPlatfrom == conveyorBelt)
+            PlatformController platformController = platform.GetComponent<PlatformController>();
+            if (platformController._receiveFromConveyor == conveyorBelt)
             {
-                return platform;
+                return platformController;
             }
         }
 

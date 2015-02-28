@@ -5,9 +5,9 @@ using System.Collections.Generic;
 public class LoadedParcelEventFlow : MonoBehaviour 
 {
     public PanelController _panelController;
-    public GameObject _workerLeft;
-    public GameObject _workerRight;
-    public GameObject _truck;
+    public WorkerController _workerLeft;
+    public WorkerController _workerRight;
+    public TruckController _truck;
 
 	#region Mono Behaviours
 
@@ -36,7 +36,7 @@ public class LoadedParcelEventFlow : MonoBehaviour
         if (ScoreManager.Instance.ParcelsLoadedOnCurrentTruck == LevelManager.Instance.CurrentLevel.TruckCapacity)
         {
             // Tell the truck to deliver some parcels
-            _truck.GetComponent<TruckController>().DeliverParcels();
+            _truck.DeliverParcels();
 
             // Player has reached the next level
             MoveToNextLevel();
@@ -50,8 +50,8 @@ public class LoadedParcelEventFlow : MonoBehaviour
         GameManager.Instance.PauseGame();
 
         // Make the workers take their break
-        _workerLeft.GetComponent<WorkerController>().TakeBreak();
-        _workerRight.GetComponent<WorkerController>().TakeBreak();
+        _workerLeft.TakeBreak();
+        _workerRight.TakeBreak();
 
         if (GameManager.Instance.Player.IsHuman)
         {
@@ -83,8 +83,8 @@ public class LoadedParcelEventFlow : MonoBehaviour
         LevelManager.Instance.LevelUp();
 
         // Make the workers get back to work
-        _workerLeft.GetComponent<WorkerController>().GetBackToWork();
-        _workerRight.GetComponent<WorkerController>().GetBackToWork();
+        _workerLeft.GetBackToWork();
+        _workerRight.GetBackToWork();
 
         // Reset counter
         ScoreManager.Instance.ParcelsLoadedOnCurrentTruck = 0;

@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    public GameObject _workerLeft;
-    public GameObject _workerRight;
+    public WorkerController _workerLeft;
+    public WorkerController _workerRight;
     public GameObject _menuButton;
     public GameObject _gamePadLeft_Up;
     public GameObject _gamePadLeft_Down;
@@ -81,16 +81,16 @@ public class InputManager : MonoBehaviour
     void HandleInputForWorkerLeft()
     {
         // Check the game is currently being played by a human and the worker is active
-        if (GameManager.Instance.CurrentState == GameState.Active && GameManager.Instance.Player.IsHuman && _workerLeft.GetComponent<WorkerController>().Active)
+        if (GameManager.Instance.CurrentState == GameState.Active && GameManager.Instance.Player.IsHuman && _workerLeft.Active)
         {
             // Look for the user pressing a key and handle the worker movement
             if (Input.GetKeyDown(Controls.workerLeft_UpKey) || GamePadPressed(_gamePadLeft_Up))
             {
-                _workerLeft.GetComponent<WorkerController>().MoveWorkerUp();
+                _workerLeft.MoveWorkerUp();
             }
             else if (Input.GetKeyDown(Controls.workerLeft_DownKey) || GamePadPressed(_gamePadLeft_Down))
             {
-                _workerLeft.GetComponent<WorkerController>().MoveWorkerDown();
+                _workerLeft.MoveWorkerDown();
             }
         }
     }
@@ -99,16 +99,16 @@ public class InputManager : MonoBehaviour
     void HandleInputForWorkerRight()
     {
         // Check the game is currently being played by a human and the worker is active
-        if (GameManager.Instance.CurrentState == GameState.Active && GameManager.Instance.Player.IsHuman && _workerRight.GetComponent<WorkerController>().Active)
+        if (GameManager.Instance.CurrentState == GameState.Active && GameManager.Instance.Player.IsHuman && _workerRight.Active)
         {
             // Look for the user pressing a key and handle the worker movement
             if (Input.GetKeyDown(Controls.workerRight_UpKey) || GamePadPressed(_gamePadRight_Up))
             {
-                _workerRight.GetComponent<WorkerController>().MoveWorkerUp();
+                _workerRight.MoveWorkerUp();
             }
             else if (Input.GetKeyDown(Controls.workerRight_DownKey) || GamePadPressed(_gamePadRight_Down))
             {
-                _workerRight.GetComponent<WorkerController>().MoveWorkerDown();
+                _workerRight.MoveWorkerDown();
             }
         }
     }
@@ -118,8 +118,8 @@ public class InputManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && IsMouseOverGamePad(gamePadButton))
         {
             // Make the game pad button opaque
-            Color currentColor = gamePadButton.GetComponent<SpriteRenderer>().color;
-            gamePadButton.GetComponent<SpriteRenderer>().color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.75f);
+            SpriteRenderer spriteRenderer = gamePadButton.GetComponent<SpriteRenderer>();
+            spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0.75f);
 
             return true;
         }
@@ -136,8 +136,8 @@ public class InputManager : MonoBehaviour
             if (Input.GetMouseButtonUp(0) && IsMouseOverGamePad(gamePadButton))
             {
                 // Make the game pad button opaque
-                Color currentColor = gamePadButton.GetComponent<SpriteRenderer>().color;
-                gamePadButton.GetComponent<SpriteRenderer>().color = new Color(currentColor.r, currentColor.g, currentColor.b, 0.5f);
+                SpriteRenderer spriteRenderer = gamePadButton.GetComponent<SpriteRenderer>();
+                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0.5f);
 
                 return true;
             }
