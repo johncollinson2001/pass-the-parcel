@@ -20,7 +20,7 @@ public class ScoreManager
     private ScoreManager() 
     {
         // Get the current high score
-        HighScore = GetSavedHighScore();
+        HighScore = PlayerPrefs.GetInt("HighScore");
 
         // Register events
         EventManager.Instance.ParcelPassed += RegisterScoreForParcelPassed;
@@ -49,7 +49,7 @@ public class ScoreManager
             HighScore = CurrentScore;
 
             // Persist the high score
-            SaveHighScore();
+            PlayerPrefs.SetInt("HighScore", HighScore);
         }
     }
 
@@ -74,35 +74,6 @@ public class ScoreManager
     {
         // For a parcel loaded, user gets X points multiplied by the level they are on
         CurrentScore += Constants.Scores.parcelLoaded * LevelManager.Instance.CurrentLevel.LevelNumber;
-    }
-
-    // Sets the high score property from the xml file
-    int GetSavedHighScore()
-    {
-        var serializer = new XmlSerializer(typeof(HighScoresModel));
-        var stream = new FileStream(Constants.Scores.highScoreXmlPath, FileMode.Open);
-        HighScoresModel highScores = serializer.Deserialize(stream) as HighScoresModel;        
-        stream.Close();
-
-        return highScores.HighScore;
-    }
-
-    void SaveHighScore()
-    {
-        // Write the high scores model to the xml file - overwriting as we go
-        var serializer = new XmlSerializer(typeof(HighScoresModel));
-        var stream = new FileStream(Constants.Scores.highScoreXmlPath, FileMode.Create);
-        using (XmlWriter writer = XmlWriter.Create(stream))
-        {
-            // Create a new high scores model
-            HighScoresModel highScores = new HighScoresModel()
-            {
-                HighScore = HighScore
-            };
-            // Save the model
-            serializer.Serialize(writer, highScores);
-        }
-        stream.Close();
     }
     
     #endregion

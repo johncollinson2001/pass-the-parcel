@@ -63,7 +63,6 @@ public static class Constants
         public static int passedParcel = 10;
         public static int parcelLoaded = 25;
         public static int levelUp = 1000;
-        public static string highScoreXmlPath = @"Assets\Data\HighScore.xml";
     }
 
     // Background

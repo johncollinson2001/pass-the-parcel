@@ -7,7 +7,14 @@ At the end of each level you get a 10 second break to regain your composure and 
 
 The game starts slowly, so you may be thinking after the first couple of levels that it's a bit easy - however it gets mighty tough further down the line.
 
-Special kudos will be given to those who know where the inspiration for the game came from ;)
+The game can be played via the web GL build here:
+
+http://johncollinson.info/pass-the-parcel
+
+The controls are:
+
+Left Worker: up = A, down = Z
+Right Worker: up = K, down = M
 
 # Features
 
