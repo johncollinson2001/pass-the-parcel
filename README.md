@@ -16,7 +16,7 @@ The game is really still in demo territory, however is fully playable. Features 
 # Technical Stuff
 The game was created in Unity 3D, using C# scripting. In order to run the code you will need to download Unity 3D.
 
-All game objects have their own controller. Collections of objects are managed by "manager" classes. There are some special classes such as the parcel spawner 
+All game objects have their own controller. Collections of objects are managed by "manager" classes. There are also some special classes worth paying attention to such as the parcel spawner, level generator and game ai.
 
 # Screenshots
 
