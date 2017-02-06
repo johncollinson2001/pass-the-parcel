@@ -86,7 +86,7 @@ public class ParcelController : MonoBehaviour
     {
         if (State != ParcelState.Broken)
         {
-            rigidbody2D.isKinematic = true;
+            GetComponent<Rigidbody2D>().isKinematic = true;
         }
     }
 
@@ -95,7 +95,7 @@ public class ParcelController : MonoBehaviour
     {
         if (State != ParcelState.Broken)
         {
-            rigidbody2D.isKinematic = false;
+            GetComponent<Rigidbody2D>().isKinematic = false;
         }
     }
 

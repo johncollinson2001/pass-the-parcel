@@ -161,8 +161,8 @@ public class ConveyorBeltController : MonoBehaviour
     void SetParcelState(GameObject parcel)
     {
         float conveyorPositionX = transform.position.x;
-        float conveyorWidth = collider2D.bounds.size.x; // Work to the collider incase of offset
-        float parcelWidth = parcel.renderer.bounds.size.x;
+        float conveyorWidth = GetComponent<Collider2D>().bounds.size.x; // Work to the collider incase of offset
+        float parcelWidth = parcel.GetComponent<Renderer>().bounds.size.x;
         ParcelController parcelController = parcel.GetComponent<ParcelController>();
 
         // The calculations will be different depending on which way the conveyor is travelling

@@ -264,10 +264,10 @@ public class WorkerController : MonoBehaviour
         // ... work out a bunch of values to help us work out where to put the parcel
         float passToConveyorPositionX = passToConveyor.transform.position.x;
         float passToConveyorPositionY = passToConveyor.transform.position.y;
-        float passToConveyorWidth = passToConveyor.collider2D.bounds.size.x; // Work to the collider incase of offset
-        float passToConveyorHeight = passToConveyor.collider2D.bounds.size.y; // Work to the collider incase of offset
-        float parcelWidth = parcel.renderer.bounds.size.x;
-        float parcelHeight = parcel.renderer.bounds.size.y;
+        float passToConveyorWidth = passToConveyor.GetComponent<Collider2D>().bounds.size.x; // Work to the collider incase of offset
+        float passToConveyorHeight = passToConveyor.GetComponent<Collider2D>().bounds.size.y; // Work to the collider incase of offset
+        float parcelWidth = parcel.GetComponent<Renderer>().bounds.size.x;
+        float parcelHeight = parcel.GetComponent<Renderer>().bounds.size.y;
         // Destination X is...
         float destinationX = 0;
         // Flip the calculations depending on the side of the screen
@@ -312,10 +312,10 @@ public class WorkerController : MonoBehaviour
         // Make the worker jump to the platform...
 
         // ... work out a bunch of values to help us work out where to jump to
-		float colliderOffset = ((BoxCollider2D)destinationPlatform.collider2D).center.y; 
+		float colliderOffset = ((BoxCollider2D)destinationPlatform.GetComponent<Collider2D>()).offset.y; 
         float destinationPlatformPositionY = destinationPlatform.transform.position.y;
-		float destinationPlatformHeight = destinationPlatform.collider2D.bounds.size.y; // Work to the collider incase of offset
-		float workerHeight = renderer.bounds.size.y;
+		float destinationPlatformHeight = destinationPlatform.GetComponent<Collider2D>().bounds.size.y; // Work to the collider incase of offset
+		float workerHeight = GetComponent<Renderer>().bounds.size.y;
         // Destination Y is...
 		float destinationY = destinationPlatformPositionY // position of the destination platform (which is centre of the Game Object)
 						+ colliderOffset // The offset of the collider from the game object

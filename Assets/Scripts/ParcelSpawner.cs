@@ -143,7 +143,7 @@ public class ParcelSpawner : MonoBehaviour
             else
             {
                 // Make the alert game object blink on/off
-                _parcelAlert.renderer.enabled = !_parcelAlert.renderer.enabled;
+                _parcelAlert.GetComponent<Renderer>().enabled = !_parcelAlert.GetComponent<Renderer>().enabled;
             }
 
             yield return new WaitForSeconds(Constants.ParcelSpawner.spawnAlertBlinkSpeed);
