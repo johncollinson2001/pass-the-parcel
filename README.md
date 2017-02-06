@@ -11,6 +11,8 @@ The game can be played via the web GL build here:
 
 http://johncollinson.info/pass-the-parcel
 
+Please note the build is for a fixed size of 960x600 - so the text is mis-aligned if you make it full screen. Will fix this at some point :)
+
 The controls are:
 
 Left Worker: up = A, down = Z
