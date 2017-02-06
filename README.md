@@ -3,7 +3,7 @@ Pass the parcel is a 2D "platform like" game, which requires you to operate two 
 
 You get 3 lives, and a dropped parcel results in a lost life. Each level requires a certain number of parcels to be loaded, and as the levels increase so does the difficulty (e.g. rate of parcels spawned, speed of the conveyors, randomness between spawns, etc etc) and the number of parcels required to be loaded. 
 
-At the end of each level you get a 10 second break to regain your composure and the workers have a slurp of thier coffee! After so many levels, you move into a new world such as underwater, desert, space.
+At the end of each level you get a 10 second break to regain your composure and let the workers have a slurp of their coffee! After so many levels, you move into a new worlds such as underwater, desert, mountains and the moon.
 
 The game starts slowly, so you may be thinking after the first couple of levels that it's a bit easy - however it gets mighty tough further down the line.
 
@@ -14,6 +14,7 @@ http://johncollinson.info/pass-the-parcel
 The controls are:
 
 Left Worker: up = A, down = Z
+
 Right Worker: up = K, down = M
 
 # Features
